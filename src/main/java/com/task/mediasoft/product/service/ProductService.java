@@ -1,10 +1,13 @@
 package com.task.mediasoft.product.service;
 
+import com.task.mediasoft.product.exception.ProductNotFoundExceptionByArticle;
+import com.task.mediasoft.product.exception.ProductNotFoundExceptionById;
 import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.repository.ProductRepository;
-import com.task.mediasoft.product.service.exception.ProductNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -19,18 +22,25 @@ import java.util.UUID;
 public class ProductService{
     private final ProductRepository productRepository;
 
+    private static final Logger log = LoggerFactory.getLogger(ProductService.class);
+
     @Transactional(readOnly = true)
     public Page<Product> getAllProducts(int page, int size, String search) {
         if (search != null && !search.isEmpty()){
-            return productRepository.findAll(PageRequest.of(page - 1, size, Sort.by("id")));
+            return productRepository.findProducts(PageRequest.of(page - 1, size, Sort.by("id")), search);
         }
-        return productRepository.findByNameContainingOrDescriptionContainingOrArticleEquals(PageRequest.of(page - 1, size, Sort.by("id")), search, search, search);
+        return productRepository.findAll(PageRequest.of(page - 1, size, Sort.by("id")));
     }
 
     @Transactional(readOnly = true)
     public Product getProductById(UUID id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException(id));
+                .orElseThrow(() -> new ProductNotFoundExceptionById(id));
+    }
+
+    @Transactional(readOnly = true)
+    public Product getProductByArticle(String article) {
+        return productRepository.findByArticleEquals(article).orElseThrow(() -> new ProductNotFoundExceptionByArticle(article));
     }
 
     @Transactional
@@ -63,5 +73,10 @@ public class ProductService{
     public void deleteProduct(UUID id) {
         Product currentProduct = getProductById(id);
         productRepository.delete(currentProduct);
+    }
+
+    @Transactional
+    public void deleteAllProduct() {
+        productRepository.deleteAll();
     }
 }

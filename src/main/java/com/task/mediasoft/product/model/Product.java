@@ -1,8 +1,7 @@
 package com.task.mediasoft.product.model;
 
-import lombok.Data;
-
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
@@ -12,6 +11,7 @@ import java.util.UUID;
 @Entity
 @Data
 @NoArgsConstructor
+@Table(indexes = @Index(name = "product_article", columnList = "article", unique = true))
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -43,7 +43,7 @@ public class Product {
 
     private LocalDateTime lastQuantityChangeDate;
 
-    @Column(name = "creation_date", updatable = false)
+    @Column(updatable = false)
     private LocalDateTime creationDate;
 
     public Product(String article, String name, String description, String category, Double price, Integer quantity) {

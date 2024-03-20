@@ -1,7 +1,8 @@
 package com.task.mediasoft.util.error;
 
 
-import com.task.mediasoft.product.service.exception.ProductNotFoundException;
+import com.task.mediasoft.product.exception.ProductNotFoundExceptionByArticle;
+import com.task.mediasoft.product.exception.ProductNotFoundExceptionById;
 import com.task.mediasoft.util.validation.ValidationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 @ControllerAdvice(annotations = RestController.class)
 public class AdviceController {
 
-    @ExceptionHandler(ProductNotFoundException.class)
+    @ExceptionHandler({ProductNotFoundExceptionById.class, ProductNotFoundExceptionByArticle.class})
     public ResponseEntity<Object> handleException(Throwable e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
@@ -30,7 +31,7 @@ public class AdviceController {
                         .map(DefaultMessageSourceResolvable::getDefaultMessage)
                         .collect(Collectors.toSet()));
 
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(validationException.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
 

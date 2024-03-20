@@ -26,7 +26,7 @@ public class ViewProductDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private final LocalDateTime lastQuantityChangeDate;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private final LocalDateTime creationDate;
 
     public ViewProductDTO(Product product) {

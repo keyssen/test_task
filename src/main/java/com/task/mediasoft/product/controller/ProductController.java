@@ -1,16 +1,14 @@
 package com.task.mediasoft.product.controller;
 
-import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.model.dto.ViewProductDTO;
 import com.task.mediasoft.product.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +24,7 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<Map<String,Object>> getAllProducts(@RequestParam(defaultValue = "1") int page,
                                                              @RequestParam(defaultValue = "5") int size,
-                                                             @RequestParam(value = "search", required = false) String search) {
+                                                             @RequestParam(required = false) String search) {
         try{
             Page<ViewProductDTO> products = productService.getAllProducts(page,size,search).map(ViewProductDTO::new);
             Map<String, Object> response = new HashMap<>();
@@ -40,10 +38,16 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/getProductByArticle")
+    public ViewProductDTO getProductByArticle(@RequestParam(value = "article", required = false) String article) {
+        return new ViewProductDTO(productService.getProductByArticle(article));
+    }
+
     @GetMapping("/{id}")
     public ViewProductDTO getProductById(@PathVariable UUID id) {
         return new ViewProductDTO(productService.getProductById(id));
     }
+
 
     @PostMapping
     public ViewProductDTO createProduct(@Valid @RequestBody SaveProductDTO productDTO) {
