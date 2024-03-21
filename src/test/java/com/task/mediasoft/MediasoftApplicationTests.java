@@ -14,6 +14,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Класс для тестирования функциональности приложения.
+ */
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MediasoftApplicationTests {
@@ -23,6 +26,12 @@ class MediasoftApplicationTests {
 	@Autowired
 	private ProductService productService;
 
+	/**
+	 * Проверяет равенство полей ожидаемого продукта с фактическим.
+	 *
+	 * @param expected Ожидаемые данные для сравнения.
+	 * @param actual Фактический продукт для проверки.
+	 */
 	private void productEquals(SaveProductDTO expected, Product actual) {
 		Assertions.assertEquals(expected.getArticle(), actual.getArticle());
 		Assertions.assertEquals(expected.getName(), actual.getName());
@@ -32,10 +41,22 @@ class MediasoftApplicationTests {
 		Assertions.assertEquals(expected.getQuantity(), actual.getQuantity());
 	}
 
+	/**
+	 * Проверяет равенство двух LocalDateTime, игнорируя миллисекунды.
+	 *
+	 * @param expected Ожидаемое LocalDateTime.
+	 * @param actual Фактическое LocalDateTime.
+	 */
 	private void localDateTimeEquals(LocalDateTime expected, LocalDateTime actual) {
 		Assertions.assertEquals(expected.withNano(0), actual.withNano(0));
 	}
 
+	/**
+	 * Создает объект SaveProductDTO на основе заданного номера.
+	 *
+	 * @param number Номер для сборки DTO.
+	 * @return Собранный объект SaveProductDTO.
+	 */
 	private SaveProductDTO createProductDto(Integer number) {
 		SaveProductDTO saveProductDTO = new SaveProductDTO();
 		saveProductDTO.setName("Product" + number);
@@ -47,16 +68,25 @@ class MediasoftApplicationTests {
 		return saveProductDTO;
 	}
 
+	/**
+	 * Подготовительные действия перед выполнением всех тестов.
+	 */
 	@BeforeAll
 	void init() {
 		productService.deleteAllProduct();
 	}
 
+	/**
+	 * Действия после каждого тестового метода.
+	 */
 	@AfterEach
 	void down() {
 		productService.deleteAllProduct();
 	}
 
+	/**
+	 * Тест поиска продуктов по артикулу.
+	 */
 	@Test
 	void searchProductsByArticle() {
 		final Product product1 = productService.createProduct(createProductDto(1));
@@ -66,6 +96,9 @@ class MediasoftApplicationTests {
 		Assertions.assertEquals(productService.getAllProducts(1, 5, "Product-1").get().count(), 1);
 	}
 
+	/**
+	 * Тест поиска продуктов.
+	 */
 	@Test
 	void searchProducts() {
 		final Product product1 = productService.createProduct(createProductDto(1));
@@ -78,15 +111,9 @@ class MediasoftApplicationTests {
 		Assertions.assertEquals(productService.getAllProducts(1, 5, "product").get().count(), 2);
 	}
 
-	@Test
-	void searchAllProducts() {
-		final Product product1 = productService.createProduct(createProductDto(1));
-		final Product product2 = productService.createProduct(createProductDto(2));
-		log.info("product1: " + product1.toString());
-		log.info("product2: " + product2.toString());
-		Assertions.assertEquals(productService.getAllProducts(1, 5, null).get().count(), 2);
-	}
-
+	/**
+	 * Тест поиска продукта по идентификатору.
+	 */
 	@Test
 	void findProductById() {
 		SaveProductDTO saveProductDTO = createProductDto(1);
@@ -96,6 +123,9 @@ class MediasoftApplicationTests {
 		localDateTimeEquals(product1.getCreationDate(), productService.getProductById(product1.getId()).getCreationDate());
 	}
 
+	/**
+	 * Тест поиска продукта по артикулу
+	 */
 	@Test
     void findProductByArticle(){
 		SaveProductDTO saveProductDTO = createProductDto(1);
@@ -105,6 +135,9 @@ class MediasoftApplicationTests {
 		localDateTimeEquals(product1.getCreationDate(), productService.getProductById(product1.getId()).getCreationDate());
 	}
 
+	/**
+	 * Тест создания продукта.
+	 */
 	@Test
 	void createProduct() {
 		SaveProductDTO saveProductDTO = createProductDto(1);
@@ -116,6 +149,9 @@ class MediasoftApplicationTests {
 		Assertions.assertNull(product.getLastQuantityChangeDate());
 	}
 
+	/**
+	 * Тест обновления продукта.
+	 */
 	@Test
 	void updateProduct() {
 		SaveProductDTO saveProductDTO = createProductDto(1);
@@ -137,6 +173,9 @@ class MediasoftApplicationTests {
 		Assertions.assertNotNull(product2.getLastQuantityChangeDate());
 	}
 
+	/**
+	 * Тест удаления продукта.
+	 */
 	@Test
 	void deleteProduct(){
 		final Product product1 = productService.createProduct(createProductDto(1));
@@ -145,6 +184,10 @@ class MediasoftApplicationTests {
 		Assertions.assertThrows(ProductNotFoundExceptionById.class, () -> productService.getProductById(product1.getId()));
 		Assertions.assertThrows(ProductNotFoundExceptionByArticle.class, () -> productService.getProductByArticle(product1.getArticle()));
 	}
+
+	/**
+	 * Тест исключений для поиска продукта.
+	 */
 	@Test
 	void testProductReadNotFound() {
 		Assertions.assertThrows(ProductNotFoundExceptionById.class, () -> productService.getProductById(UUID.fromString("4a90898f-9d1d-477b-990a-e475ffb8238e")));

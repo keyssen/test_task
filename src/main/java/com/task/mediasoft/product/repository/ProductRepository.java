@@ -11,8 +11,19 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Интерфейс репозитория для сущности Product.
+ * {@link Product}.
+ */
 @Repository
 public interface ProductRepository extends JpaRepository<Product, UUID> {
+    /**
+     * Получает продукты, соответствующие заданным критериям поиска.
+     *
+     * @param pageable информация о пагинации
+     * @param search строка поиска для фильтрации продуктов по имени, описанию, категории или артикулу
+     * @return страница продуктов, соответствующих критериям поиска
+     */
     @Query("SELECT p FROM Product " +
             "p WHERE lower(p.name) LIKE lower(concat('%', :search, '%')) " +
             "OR lower(p.description) LIKE lower(concat('%', :search, '%')) " +
@@ -20,5 +31,11 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             "OR lower(p.article) = lower(:search)")
     Page<Product> findProducts(Pageable pageable, @Param("search") String search);
 
-    Optional<Product> findByArticleEquals(String Article);
+    /**
+     * Получает объект Product с указанным артикулом (article).
+     *
+     * @param article артикул, который необходимо найти
+     * @return Optional сущности Product, если найдено, в противном случае пусто
+     */
+    Optional<Product> findByArticleEquals(String article);
 }

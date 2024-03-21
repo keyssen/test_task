@@ -14,16 +14,31 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.stream.Collectors;
 
-//контроллер для обработки разнообразных ошибок при работе с запросами к БД
+/**
+ * Класс, являющийся глобальным обработчиком исключений
+ */
 @ControllerAdvice(annotations = RestController.class)
 public class AdviceController {
 
+    /**
+     * Обработчик исключений ProductNotFoundExceptionById и ProductNotFoundExceptionByArticle.
+     * Возвращает ответ с сообщением об ошибке и статусом NOT_FOUND.
+     *
+     * @param e Исключение, которое необходимо обработать.
+     * @return ResponseEntity с сообщением об ошибке и статусом NOT_FOUND.
+     */
     @ExceptionHandler({ProductNotFoundExceptionById.class, ProductNotFoundExceptionByArticle.class})
     public ResponseEntity<Object> handleException(Throwable e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    //при исключении автоматической валидации данных
+    /**
+     * Обработчик исключения MethodArgumentNotValidException при автоматической валидации данных.
+     * Возвращает ответ с сообщением об ошибке валидации и статусом BAD_REQUEST.
+     *
+     * @param e Исключение MethodArgumentNotValidException, которое необходимо обработать.
+     * @return ResponseEntity с сообщением об ошибке валидации и статусом BAD_REQUEST.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleBindException(MethodArgumentNotValidException e) {
         final ValidationException validationException = new ValidationException(
@@ -35,7 +50,14 @@ public class AdviceController {
     }
 
 
-    //обработка неизвестных ошибок
+    /**
+     * Обработчик неизвестных исключений.
+     * Возвращает ответ с сообщением об ошибке и статусом INTERNAL_SERVER_ERROR.
+     * Также выводит стек трейс исключения в консоль.
+     *
+     * @param e Исключение, которое необходимо обработать.
+     * @return ResponseEntity с сообщением об ошибке и статусом INTERNAL_SERVER_ERROR.
+     */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleUnknownException(Throwable e) {
         e.printStackTrace();
