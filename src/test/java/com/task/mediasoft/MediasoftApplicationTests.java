@@ -148,5 +148,6 @@ class MediasoftApplicationTests {
 	@Test
 	void testProductReadNotFound() {
 		Assertions.assertThrows(ProductNotFoundExceptionById.class, () -> productService.getProductById(UUID.fromString("4a90898f-9d1d-477b-990a-e475ffb8238e")));
+		Assertions.assertThrows(ProductNotFoundExceptionByArticle.class, () -> productService.getProductByArticle("Product-1"));
 	}
 }
