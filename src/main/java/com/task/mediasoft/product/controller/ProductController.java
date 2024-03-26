@@ -52,8 +52,8 @@ public class ProductController {
      * @param article Артикул продукта.
      * @return Данные о продукте.
      */
-    @GetMapping("/getProductByArticle")
-    public ViewProductDTO getProductByArticle(@RequestParam(value = "article") String article) {
+    @GetMapping("/getProductByArticle/{article}")
+    public ViewProductDTO getProductByArticle(@PathVariable String article) {
         return new ViewProductDTO(productService.getProductByArticle(article));
     }
 

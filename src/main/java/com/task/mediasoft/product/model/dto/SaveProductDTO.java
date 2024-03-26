@@ -45,6 +45,7 @@ public class SaveProductDTO {
      * Не может быть пустой.
      */
     @NotNull(message = "Category is required")
+    @Size(min = 3, max = 255)
     private String category;
 
     /**

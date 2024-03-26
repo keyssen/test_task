@@ -1,0 +1,358 @@
+{
+	"info": {
+		"_postman_id": "34c33f6e-c5bc-4448-8033-3b941e6185d7",
+		"name": "MediasoftWarehouse",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33784170"
+	},
+	"item": [
+		{
+			"name": "Pagination search products",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/products?page=1&size=5&search=product-name-1",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "5"
+						},
+						{
+							"key": "search",
+							"value": "product-name-1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pagination products",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/products?page=1&size=5",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "size",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get product by id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/products/{{productId}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"products",
+						"{{productId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get product by article",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/products/getProductByArticle/{{productArticle}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"products",
+						"getProductByArticle",
+						"{{productArticle}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const productNumber = pm.environment.get(\"productNumber\"); \r",
+							"const createdProduct = pm.response.json();\r",
+							"\r",
+							"pm.environment.set(\"productId\", createdProduct.id);\r",
+							"pm.environment.set(\"productArticle\", createdProduct.article);\r",
+							"pm.environment.set(\"productNumber\", +productNumber + 1);\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Body creationDate is not null\", function () {\r",
+							"    pm.expect(createdProduct.creationDate).not.eq(null);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Body lastQuantityChangeDate is null\", function () {\r",
+							"    pm.expect(createdProduct.lastQuantityChangeDate).to.eql(null);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"article\": \"product-article-{{productNumber}}\",\r\n  \"name\": \"product-name-{{productNumber}}\",\r\n  \"description\": \"product-description-{{productNumber}}\",\r\n  \"category\": \"product-category-{{productNumber}}\",\r\n  \"price\": 10,\r\n  \"quantity\": 0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/products",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create product negative",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"article\": \"product-article-{{productNumber}}\",\r\n  \"name\": \"product-name-{{productNumber}}\",\r\n  \"description\": \"product-description-{{productNumber}}\",\r\n  \"price\": 10,\r\n  \"quantity\": 0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/products",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const updatedProduct = pm.response.json();\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Body creationDate is not null\", function () {\r",
+							"    pm.expect(updatedProduct.creationDate).not.eql(null);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Body lastQuantityChangeDate is null\", function () {\r",
+							"    pm.expect(updatedProduct.lastQuantityChangeDate).not.eql(null);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"article\": \"product-article-update\",\r\n  \"name\": \"product-name-update\",\r\n  \"description\": \"product-description-update\",\r\n  \"category\": \"product-category-update\",\r\n  \"price\": 100,\r\n  \"quantity\": 10\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/products/{{productId}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"products",
+						"{{productId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/products/{{productId}}",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"products",
+						"{{productId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
