@@ -15,7 +15,6 @@ import java.util.UUID;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(indexes = @Index(name = "product_article", columnList = "article", unique = true))
 public class Product {
     /**
      * Уникальный идентификатор продукта.
@@ -28,7 +27,7 @@ public class Product {
      * Артикул продукта.
      */
     @NonNull
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String article;
 
     /**
@@ -56,7 +55,7 @@ public class Product {
      * Цена продукта.
      */
     @NonNull
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition="numeric(10,2)")
     private Double price;
 
     /**
@@ -74,7 +73,7 @@ public class Product {
     /**
      * Дата создания продукта.
      */
-    @Column(updatable = false)
+    @Column(updatable = false, nullable = false)
     private LocalDateTime creationDate;
 
     /**
