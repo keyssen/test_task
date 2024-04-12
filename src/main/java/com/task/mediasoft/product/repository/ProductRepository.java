@@ -38,4 +38,12 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
      * @return Optional сущности Product, если найдено, в противном случае пусто
      */
     Optional<Product> findByArticleEquals(String article);
+
+    /**
+     * Проверка существования продукта по артикулу.
+     *
+     * @param article Артикул продукта.
+     * @return True, если продукт с указанным артикулом существует, иначе false.
+     */
+    boolean existsByArticle(String article);
 }
