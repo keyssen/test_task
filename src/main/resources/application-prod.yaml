@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/mediasoft_test
     username: postgres
-    password: password
+    password: ${PWD}
     driverClassName: org.postgresql.Driver
 
   jpa:
