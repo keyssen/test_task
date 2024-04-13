@@ -2,12 +2,11 @@ package com.task.mediasoft.product.service;
 
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionByArticle;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionById;
+import com.task.mediasoft.product.exception.ProductWithArticleAlreadyExistsException;
 import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -22,20 +22,20 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
-public class ProductService{
+public class ProductService {
     private final ProductRepository productRepository;
 
     /**
      * Получение продуктов с возможностью поиска по строке.
      *
-     * @param page Номер страницы.
-     * @param size Количество элементов на странице.
+     * @param page   Номер страницы.
+     * @param size   Количество элементов на странице.
      * @param search Строка поиска по имени продукта.
      * @return Страница продуктов.
      */
     @Transactional(readOnly = true)
     public Page<Product> getAllProducts(int page, int size, String search) {
-        if (search != null && !search.isEmpty()){
+        if (search != null && !search.isEmpty()) {
             return productRepository.findProducts(PageRequest.of(page - 1, size, Sort.by("id")), search);
         }
         return productRepository.findAll(PageRequest.of(page - 1, size, Sort.by("id")));
@@ -74,6 +74,9 @@ public class ProductService{
      */
     @Transactional
     public Product createProduct(SaveProductDTO createProductDTO) {
+        if (productRepository.existsByArticle(createProductDTO.getArticle())) {
+            throw new ProductWithArticleAlreadyExistsException(createProductDTO.getArticle());
+        }
         Product product = new Product(createProductDTO);
         product.setCreationDate(LocalDateTime.now());
         return productRepository.save(product);
@@ -82,15 +85,18 @@ public class ProductService{
     /**
      * Обновление информации о продукте.
      *
-     * @param id Идентификатор продукта.
+     * @param id                Идентификатор продукта.
      * @param updateProducttDTO DTO с обновленными данными продукта.
      * @return Обновленный продукт.
      */
     @Transactional
     public Product updateProduct(UUID id, SaveProductDTO updateProducttDTO) {
-        Product currentProduct = getProductById(id);
-
-        if (currentProduct.getQuantity() != updateProducttDTO.getQuantity()){
+        Product currentProduct = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundExceptionById(id));
+        if (productRepository.existsByArticle(updateProducttDTO.getArticle()) && !Objects.equals(currentProduct.getArticle(), updateProducttDTO.getArticle())) {
+            throw new ProductWithArticleAlreadyExistsException(currentProduct.getArticle());
+        }
+        if (!Objects.equals(currentProduct.getQuantity(), updateProducttDTO.getQuantity())) {
             currentProduct.setQuantity(updateProducttDTO.getQuantity());
             currentProduct.setLastQuantityChangeDate(LocalDateTime.now());
         }
@@ -112,7 +118,8 @@ public class ProductService{
      */
     @Transactional
     public void deleteProduct(UUID id) {
-        Product currentProduct = getProductById(id);
+        Product currentProduct = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundExceptionById(id));
         productRepository.delete(currentProduct);
     }
 

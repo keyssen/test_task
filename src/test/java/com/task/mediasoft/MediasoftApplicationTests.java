@@ -2,6 +2,7 @@ package com.task.mediasoft;
 
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionByArticle;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionById;
+import com.task.mediasoft.product.exception.ProductWithArticleAlreadyExistsException;
 import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.service.ProductService;
@@ -192,5 +193,29 @@ class MediasoftApplicationTests {
 	void testProductReadNotFound() {
 		Assertions.assertThrows(ProductNotFoundExceptionById.class, () -> productService.getProductById(UUID.fromString("4a90898f-9d1d-477b-990a-e475ffb8238e")));
 		Assertions.assertThrows(ProductNotFoundExceptionByArticle.class, () -> productService.getProductByArticle("Product-1"));
+	}
+
+	/**
+	 * Тест исключения для обновления продукта с существующим артикулом.
+	 */
+	@Test
+	void testProductArticleAlredyExist() {
+		final Product product1 = productService.createProduct(createProductDto(1));
+		log.info("product1: " + product1.toString());
+		final Product product2 = productService.createProduct(createProductDto(2));
+		log.info("product2: " + product2.toString());
+		Assertions.assertThrows(ProductWithArticleAlreadyExistsException.class, () -> productService.updateProduct(product1.getId(), createProductDto(2)));
+		Assertions.assertEquals(product2.getArticle(), productService.updateProduct(product2.getId(), createProductDto(2)).getArticle());
+	}
+
+	/**
+	 * Тест исключения удаления продукта которого не существует.
+	 */
+	@Test
+	void testProductDeleteNotFound() {
+		final Product product1 = productService.createProduct(createProductDto(1));
+		log.info("product1: " + product1.toString());
+		productService.deleteProduct(product1.getId());
+		Assertions.assertThrows(ProductNotFoundExceptionById.class, () -> productService.deleteProduct(product1.getId()));
 	}
 }

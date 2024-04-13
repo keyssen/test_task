@@ -38,7 +38,7 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'com.h2database:h2:2.1.210'
 
-	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.liquibase:liquibase-core:4.27.0'
 }
 
 tasks.named('test') {
