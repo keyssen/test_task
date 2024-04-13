@@ -20,3 +20,10 @@ spring:
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/db.changelog-master.xml
+
+app:
+  scheduling:
+    enabled: true
+    period: 60000
+    priceIncreasePercentage: 10.1
+    optimization: false
