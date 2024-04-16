@@ -55,7 +55,7 @@ public class Product {
      * Цена продукта.
      */
     @NonNull
-    @Column(nullable = false, columnDefinition="numeric(10,2)")
+    @Column(nullable = false, columnDefinition = "numeric(10,2)")
     private Double price;
 
     /**
@@ -68,16 +68,19 @@ public class Product {
     /**
      * Дата последнего изменения количества продукта.
      */
+    @NonNull
+    @Column(name = "last_quantity_change_date", nullable = false)
     private LocalDateTime lastQuantityChangeDate;
 
     /**
      * Дата создания продукта.
      */
-    @Column(updatable = false, nullable = false)
+    @Column(name = "creation_date", updatable = false, nullable = false)
     private LocalDateTime creationDate;
 
     /**
      * Конструктор для создания нового продукта  на основе объекта {@link SaveProductDTO}.
+     *
      * @param saveProductDTO Объект {@link SaveProductDTO}, на основе которого создается продукт.
      */
     public Product(SaveProductDTO saveProductDTO) {

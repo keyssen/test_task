@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,7 +22,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
      * Получает продукты, соответствующие заданным критериям поиска.
      *
      * @param pageable информация о пагинации
-     * @param search строка поиска для фильтрации продуктов по имени, описанию, категории или артикулу
+     * @param search   строка поиска для фильтрации продуктов по имени, описанию, категории или артикулу
      * @return страница продуктов, соответствующих критериям поиска
      */
     @Query("SELECT p FROM Product " +
@@ -30,6 +31,9 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
             "OR lower(p.category) LIKE lower(concat('%', :search, '%')) " +
             "OR lower(p.article) = lower(:search)")
     Page<Product> findProducts(Pageable pageable, @Param("search") String search);
+
+    @Query(nativeQuery = true, value = "SELECT * FROM Product p WHERE p.id = :id FOR UPDATE")
+    Optional<Product> findProduct(@Param("id") UUID id);
 
     /**
      * Получает объект Product с указанным артикулом (article).
@@ -46,4 +50,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
      * @return True, если продукт с указанным артикулом существует, иначе false.
      */
     boolean existsByArticle(String article);
+
+    //    @Lock(LockModeType.OPTIMISTIC)
+    List<Product> findAll();
 }
