@@ -51,7 +51,6 @@ public class ProductService {
     @Transactional
     public Product getProductById(UUID id) {
         return productRepository.findById(id)
-//        return productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundExceptionById(id));
     }
 

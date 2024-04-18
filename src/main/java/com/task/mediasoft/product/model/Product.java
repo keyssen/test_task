@@ -2,6 +2,7 @@ package com.task.mediasoft.product.model;
 
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Product {
     /**
      * Уникальный идентификатор продукта.

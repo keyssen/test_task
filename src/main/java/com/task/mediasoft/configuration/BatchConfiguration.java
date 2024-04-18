@@ -8,11 +8,9 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
-import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
 import org.springframework.batch.item.database.support.PostgresPagingQueryProvider;
 import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.builder.FlatFileItemWriterBuilder;
@@ -32,28 +30,53 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Конфигурационный класс BatchConfiguration предоставляет настройки для выполнения
+ * пакетных операций в приложении. Он определяет компоненты Spring Batch,
+ * такие как чтение данных, обработка данных и запись данных.
+ * Этот класс активируется только в профиле "prod" и при условии,
+ * что параметры app.scheduling.enabled, app.scheduling.optimization установлены в "true",
+ * а app.scheduling.preparedStatement установлены в "false".
+ */
 @Configuration
-@ConditionalOnExpression("'${app.scheduling.enabled}'.equals('true') and '${app.scheduling.optimization}'.equals('true')")
+@ConditionalOnExpression("'${app.scheduling.enabled}'.equals('true') and '${app.scheduling.optimization}'.equals('true') and '${app.scheduling.preparedStatement}'.equals('false')")
 @Profile("prod")
 public class BatchConfiguration {
+
+    /**
+     * Создает JdbcPagingItemReader для чтения данных о продуктах из источника данных.
+     *
+     * @param dataSource Источник данных, из которого будут читаться продукты.
+     * @return JdbcPagingItemReader для чтения данных о продуктах.
+     * @throws Exception если возникают проблемы с созданием объекта JdbcPagingItemReader.
+     */
     @Bean
     public JdbcPagingItemReader<Product> reader(DataSource dataSource) throws Exception {
         JdbcPagingItemReader<Product> reader = new JdbcPagingItemReader<>();
         reader.setDataSource(dataSource);
-        // вытянули из бд за запрос
         reader.setFetchSize(10000);
         reader.setRowMapper(productRowMapper());
         reader.setQueryProvider(queryProvider());
-        // размер порции данных, которая будет загружена и обработана за один раз в рамках пейджинга данных
         reader.setPageSize(1000);
         return reader;
     }
 
+    /**
+     * Создает RowMapper для сопоставления строк базы данных с объектами Product.
+     *
+     * @return RowMapper для сопоставления строк базы данных с объектами Product.
+     */
     @Bean
     public RowMapper<Product> productRowMapper() {
         return new BeanPropertyRowMapper<>(Product.class);
     }
 
+    /**
+     * Создает PostgresPagingQueryProvider для построения SQL-запросов на основе пагинации.
+     *
+     * @return PostgresPagingQueryProvider для построения SQL-запросов.
+     * @throws Exception если возникают проблемы с созданием объекта PostgresPagingQueryProvider.
+     */
     @Bean
     public PostgresPagingQueryProvider queryProvider() throws Exception {
         PostgresPagingQueryProvider queryProvider = new PostgresPagingQueryProvider();
@@ -65,11 +88,22 @@ public class BatchConfiguration {
         return queryProvider;
     }
 
+    /**
+     * Создает ItemProcessor для обработки продуктов.
+     *
+     * @return ItemProcessor для обработки продуктов.
+     */
     @Bean
     public ItemProcessor<Product, Product> processor() {
         return new ProductItemProcessor();
     }
 
+    /**
+     * Создает JdbcBatchItemWriter для записи обновлений цены продуктов в базу данных.
+     *
+     * @param dataSource Источник данных для записи.
+     * @return JdbcBatchItemWriter для записи обновлений цены продуктов.
+     */
     @Bean
     public JdbcBatchItemWriter<Product> writer(DataSource dataSource) {
         return new JdbcBatchItemWriterBuilder<Product>()
@@ -79,19 +113,11 @@ public class BatchConfiguration {
                 .build();
     }
 
-    @Bean
-    public JdbcCursorItemReader<Product> itemReader(DataSource dataSource) {
-        return new JdbcCursorItemReaderBuilder<Product>()
-                .dataSource(dataSource)
-                .name("creditReader")
-//                .sql("SELECT * FROM product ORDER BY id ASC LIMIT 1000 FOR UPDATE")
-                .sql("SELECT * FROM product FOR UPDATE")
-//                .sql("SELECT * FROM product")
-                .rowMapper(productRowMapper())
-                .build();
-    }
-
-
+    /**
+     * Создает FlatFileItemWriter для записи продуктов в файл.
+     *
+     * @return FlatFileItemWriter для записи продуктов в файл.
+     */
     @Bean
     public FlatFileItemWriter<Product> fileWriter() {
         return new FlatFileItemWriterBuilder<Product>()
@@ -102,6 +128,12 @@ public class BatchConfiguration {
                 .build();
     }
 
+    /**
+     * Создает CompositeItemWriter для объединения JdbcBatchItemWriter и FlatFileItemWriter.
+     *
+     * @param dataSource Источник данных для записи в базу данных.
+     * @return CompositeItemWriter для записи данных в различные источники.
+     */
     @Bean
     public CompositeItemWriter<Product> compositeItemWriter(DataSource dataSource) {
         CompositeItemWriter<Product> compositeWriter = new CompositeItemWriter<>();
@@ -109,6 +141,13 @@ public class BatchConfiguration {
         return compositeWriter;
     }
 
+    /**
+     * Создает Job для импорта продуктов.
+     *
+     * @param jobRepository Репозиторий Job для создания заданий.
+     * @param step1         Шаг для выполнения задания импорта продуктов.
+     * @return Job для импорта продуктов.
+     */
     @Bean
     public Job importUserJob(JobRepository jobRepository, Step step1) {
         return new JobBuilder("importUserJob", jobRepository)
@@ -116,9 +155,19 @@ public class BatchConfiguration {
                 .build();
     }
 
+    /**
+     * Создает Step для обработки импорта продуктов.
+     *
+     * @param jobRepository       Репозиторий Job для создания заданий.
+     * @param transactionManager  Менеджер транзакций для управления транзакциями шага.
+     * @param reader              Читатель данных о продуктах.
+     * @param processor           Процессор для обработки данных о продуктах.
+     * @param compositeItemWriter Объединенный писатель для записи данных о продуктах.
+     * @return Step для обработки импорта продуктов.
+     */
     @Bean
     public Step step1(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-                      JdbcCursorItemReader<Product> reader, ItemProcessor<Product, Product> processor,
+                      JdbcPagingItemReader<Product> reader, ItemProcessor<Product, Product> processor,
                       CompositeItemWriter<Product> compositeItemWriter) {
         return new StepBuilder("step1", jobRepository)
                 .<Product, Product>chunk(100000, transactionManager)
