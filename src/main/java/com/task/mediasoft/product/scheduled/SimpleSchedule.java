@@ -46,11 +46,8 @@ public class SimpleSchedule {
     @MeasureExecutionTime
     public void scheduleFixedDelayTask() {
         log.info("START SimpleSchedule");
-        final List<Product> productList = productRepository.findAll().stream()
-                .map(product -> {
-                    product.setPrice(product.getPrice() * (1 + priceIncreasePercentage / 100));
-                    return product;
-                }).toList();
+        final List<Product> productList = productRepository.findAll();
+        productList.forEach(product -> product.setPrice(product.getPrice() * (1 + priceIncreasePercentage / 100)));
         productRepository.saveAll(productList);
         log.info("END SimpleSchedule");
     }
