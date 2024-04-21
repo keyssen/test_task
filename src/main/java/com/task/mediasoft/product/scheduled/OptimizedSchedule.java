@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.UUID;
 
 /**
@@ -32,10 +33,10 @@ import java.util.UUID;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnExpression("'${app.scheduling.enabled}'.equals('true') and '${app.scheduling.optimization}'.equals('true') and '${app.scheduling.preparedStatement}'.equals('true')")
+@ConditionalOnExpression("${app.scheduling.enabled:false} and ${app.scheduling.optimization:false}")
+//@ConditionalOnExpression(value = "#{'${app.scheduling.mode:none}'.equals('optimization') and !${app.scheduling.optimization.spring-batch:false}}")
 @Profile("prod")
-public class OptimizedPreparedStatementSchedule {
-
+public class OptimizedSchedule {
     /**
      * Процент увеличения цены продукта
      */
@@ -62,60 +63,60 @@ public class OptimizedPreparedStatementSchedule {
     @MeasureExecutionTime
     @Transactional
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    public void scheduleFixedDelayTask() throws SQLException, IOException {
+    public void scheduleFixedDelayTask() {
         try (Connection connection = dataSource.getConnection()) {
             log.info("OptimizedSchedule: Start.");
-            BufferedWriter writer = new BufferedWriter(new FileWriter("products.txt"));
-            // отключаем автокоммит, чтобы управлять транзакцией явно
             connection.setAutoCommit(false);
 
-//            String selectQuery = "SELECT * FROM product FOR UPDATE";
-            String selectQuery = "SELECT * FROM product";
+            String selectQuery = "SELECT * FROM product FOR UPDATE";
             String updateQuery = "UPDATE product SET price = ? WHERE id = ?";
 
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("products.txt"))) {
+                Statement selectStatement = connection.createStatement();
+                PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+                ResultSet resultSet = selectStatement.executeQuery(selectQuery);
 
-            try (PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
-                 PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
-
-                ResultSet resultSet = selectStatement.executeQuery();
                 int columnCount = resultSet.getMetaData().getColumnCount();
                 int count = 0;
+                double coefficient = 1 + priceIncreasePercentage / 100;
                 while (resultSet.next()) {
                     UUID id = (UUID) resultSet.getObject("id");
                     double currentPrice = resultSet.getDouble("price");
-                    double newPrice = currentPrice * (1 + priceIncreasePercentage / 100);
+                    double newPrice = currentPrice * coefficient;
 
-                    StringBuilder row = new StringBuilder();
-                    for (int i = 1; i <= columnCount; i++) {
-                        if (i == columnCount) {
-                            row.append(resultSet.getString(i));
-                        } else {
-                            row.append(resultSet.getString(i)).append(", ");
-                        }
-                    }
-                    writer.write(row.toString());
+                    writer.write(productToString(resultSet, columnCount));
                     writer.newLine();
                     updateStatement.setDouble(1, newPrice);
                     updateStatement.setObject(2, id);
                     updateStatement.addBatch();
                     count++;
-                    // Если достигнут размер пакета, выполнить пакетное обновление
                     if (count % BATCH_SIZE == 0) {
                         updateStatement.executeBatch();
                     }
                 }
 
                 updateStatement.executeBatch();
-                // фиксируем транзакцию
                 connection.commit();
-            } catch (SQLException | IOException e) {
-                // откатываем транзакцию в случае исключения
+            } catch (SQLException e) {
                 connection.rollback();
                 e.printStackTrace();
-            } finally {
-                connection.setAutoCommit(true);
-                writer.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String productToString(ResultSet resultSet, int columnCount) throws SQLException {
+        StringBuilder row = new StringBuilder();
+        for (int i = 1; i <= columnCount; i++) {
+            if (i == columnCount) {
+                row.append(resultSet.getString(i));
+            } else {
+                row.append(resultSet.getString(i)).append(", ");
             }
         }
+        return row.toString();
     }
 }

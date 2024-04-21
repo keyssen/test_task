@@ -22,7 +22,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-@ConditionalOnExpression("'${app.scheduling.enabled}'.equals('true') and '${app.scheduling.optimization}'.equals('false')")
+@ConditionalOnExpression("${app.scheduling.enabled:false} and !${app.scheduling.optimization:false}")
 @Profile("prod")
 public class SimpleSchedule {
 
@@ -46,8 +46,9 @@ public class SimpleSchedule {
     @MeasureExecutionTime
     public void scheduleFixedDelayTask() {
         log.info("START SimpleSchedule");
+        double coefficient = 1 + priceIncreasePercentage / 100;
         final List<Product> productList = productRepository.findAll();
-        productList.forEach(product -> product.setPrice(product.getPrice() * (1 + priceIncreasePercentage / 100)));
+        productList.forEach(product -> product.setPrice(product.getPrice() * coefficient));
         productRepository.saveAll(productList);
         log.info("END SimpleSchedule");
     }

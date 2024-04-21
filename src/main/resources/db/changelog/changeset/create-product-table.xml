@@ -26,7 +26,6 @@
                 <constraints nullable="false"/>
             </column>
             <column name="last_quantity_change_date" type="timestamp(6)">
-                <constraints nullable="false"/>
             </column>
             <column name="creation_date" type="timestamp(6)">
                 <constraints nullable="false"/>

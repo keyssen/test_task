@@ -1,8 +1,11 @@
 package com.task.mediasoft.product.model;
 
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -16,7 +19,6 @@ import java.util.UUID;
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 public class Product {
     /**
      * Уникальный идентификатор продукта.
@@ -70,14 +72,12 @@ public class Product {
     /**
      * Дата последнего изменения количества продукта.
      */
-    @NonNull
-    @Column(name = "last_quantity_change_date", nullable = false)
     private LocalDateTime lastQuantityChangeDate;
 
     /**
      * Дата создания продукта.
      */
-    @Column(name = "creation_date", updatable = false, nullable = false)
+    @Column(updatable = false, nullable = false)
     private LocalDateTime creationDate;
 
     /**

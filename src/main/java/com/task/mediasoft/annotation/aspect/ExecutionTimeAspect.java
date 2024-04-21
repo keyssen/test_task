@@ -29,16 +29,16 @@ public class ExecutionTimeAspect {
     @Around("@annotation(com.task.mediasoft.annotation.MeasureExecutionTime)")
     public Object measureExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.nanoTime();
-
-        Object result = joinPoint.proceed();
-
-        long endTime = System.nanoTime();
-        long executionTimeInNanos = endTime - startTime;
         Signature signature = joinPoint.getSignature();
 
-        double executionTimeInSeconds = executionTimeInNanos / 1e9;
-        log.info("{} execution time: {}s", signature.toShortString(), executionTimeInSeconds);
+        try {
+            return joinPoint.proceed();
+        } finally {
+            long endTime = System.nanoTime();
+            long executionTimeInNanos = endTime - startTime;
 
-        return result;
+            double executionTimeInSeconds = executionTimeInNanos / 1e9;
+            log.info("{} execution time: {}s", signature.toShortString(), executionTimeInSeconds);
+        }
     }
 }
