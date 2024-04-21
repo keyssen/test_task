@@ -1,10 +1,15 @@
 package com.task.mediasoft.product.model;
 
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
-import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,7 +18,8 @@ import java.util.UUID;
  * Сущность, представляющая продукт.
  */
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 public class Product {
     /**
@@ -55,7 +61,7 @@ public class Product {
      * Цена продукта.
      */
     @NonNull
-    @Column(nullable = false, columnDefinition="numeric(10,2)")
+    @Column(nullable = false, columnDefinition = "numeric(10,2)")
     private Double price;
 
     /**
@@ -68,16 +74,19 @@ public class Product {
     /**
      * Дата последнего изменения количества продукта.
      */
+    @NonNull
+    @Column(name = "last_quantity_change_date", nullable = false)
     private LocalDateTime lastQuantityChangeDate;
 
     /**
      * Дата создания продукта.
      */
-    @Column(updatable = false, nullable = false)
+    @Column(name = "creation_date", updatable = false, nullable = false)
     private LocalDateTime creationDate;
 
     /**
      * Конструктор для создания нового продукта  на основе объекта {@link SaveProductDTO}.
+     *
      * @param saveProductDTO Объект {@link SaveProductDTO}, на основе которого создается продукт.
      */
     public Product(SaveProductDTO saveProductDTO) {

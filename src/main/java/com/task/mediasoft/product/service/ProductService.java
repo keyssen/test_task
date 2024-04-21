@@ -79,6 +79,7 @@ public class ProductService {
         }
         Product product = new Product(createProductDTO);
         product.setCreationDate(LocalDateTime.now());
+        product.setLastQuantityChangeDate(LocalDateTime.now());
         return productRepository.save(product);
     }
 
