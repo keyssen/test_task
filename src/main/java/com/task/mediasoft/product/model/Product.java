@@ -72,12 +72,14 @@ public class Product {
     /**
      * Дата последнего изменения количества продукта.
      */
+    @NonNull
+    @Column(name = "last_quantity_change_date", nullable = false)
     private LocalDateTime lastQuantityChangeDate;
 
     /**
      * Дата создания продукта.
      */
-    @Column(updatable = false, nullable = false)
+    @Column(name = "creation_date", updatable = false, nullable = false)
     private LocalDateTime creationDate;
 
     /**
