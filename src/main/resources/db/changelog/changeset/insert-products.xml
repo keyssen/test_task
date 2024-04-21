@@ -7,8 +7,8 @@
             INSERT INTO product (id, article, name, description, category, price, quantity, last_quantity_change_date,
                                  creation_date)
             SELECT gen_random_uuid(),
-                   'Product ' || s,
                    'Article ' || s,
+                   'Product ' || s,
                    'Description ' || s,
                    'CLOTHING',
                    100.0,
