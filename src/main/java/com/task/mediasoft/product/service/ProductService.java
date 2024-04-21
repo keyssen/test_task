@@ -78,8 +78,6 @@ public class ProductService {
             throw new ProductWithArticleAlreadyExistsException(createProductDTO.getArticle());
         }
         Product product = new Product(createProductDTO);
-        product.setCreationDate(LocalDateTime.now());
-        product.setLastQuantityChangeDate(LocalDateTime.now());
         return productRepository.save(product);
     }
 

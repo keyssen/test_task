@@ -1,5 +1,6 @@
 package com.task.mediasoft.product.model.dto;
 
+import com.task.mediasoft.product.model.CategoryType;
 import com.task.mediasoft.product.model.Product;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +10,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 
 /**
  * DTO класс для сохранения информации о продукте.
@@ -49,8 +52,7 @@ public class SaveProductDTO {
      * Не может быть пустой.
      */
     @NotNull(message = "Category is required")
-    @Size(min = 3, max = 255)
-    private String category;
+    private CategoryType category;
 
     /**
      * Цена продукта.
@@ -58,7 +60,7 @@ public class SaveProductDTO {
      */
     @NotNull(message = "Price is required")
     @Positive(message = "Price must be a positive number")
-    private Double price;
+    private BigDecimal price;
 
     /**
      * Количество продукта.
@@ -66,5 +68,5 @@ public class SaveProductDTO {
      */
     @NotNull(message = "Quantity is required")
     @PositiveOrZero(message = "Quantity must be a positive number")
-    private Integer quantity;
+    private Long quantity;
 }
