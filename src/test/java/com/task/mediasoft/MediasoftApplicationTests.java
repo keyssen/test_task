@@ -3,6 +3,7 @@ package com.task.mediasoft;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionByArticle;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionById;
 import com.task.mediasoft.product.exception.ProductWithArticleAlreadyExistsException;
+import com.task.mediasoft.product.model.CategoryType;
 import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.service.ProductService;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -65,10 +67,10 @@ class MediasoftApplicationTests {
     private SaveProductDTO createProductDto(Integer number) {
         SaveProductDTO saveProductDTO = new SaveProductDTO();
         saveProductDTO.setName("Product" + number);
-        saveProductDTO.setCategory("Category" + number);
+        saveProductDTO.setCategory(CategoryType.BOOKS);
         saveProductDTO.setDescription("Description" + number);
-        saveProductDTO.setQuantity(10);
-        saveProductDTO.setPrice(10.1);
+        saveProductDTO.setQuantity(10L);
+        saveProductDTO.setPrice(BigDecimal.valueOf(10.1));
         saveProductDTO.setArticle("Product-" + number);
         return saveProductDTO;
     }
@@ -125,7 +127,7 @@ class MediasoftApplicationTests {
         final Product product1 = productService.createProduct(saveProductDTO);
         log.info("product1: " + product1.toString());
         productEquals(saveProductDTO, product1);
-        localDateTimeEquals(product1.getCreationDate(), productService.getProductById(product1.getId()).getCreationDate());
+        Assertions.assertEquals(product1.getCreationDate(), productService.getProductById(product1.getId()).getCreationDate());
     }
 
     /**
@@ -137,7 +139,7 @@ class MediasoftApplicationTests {
         final Product product1 = productService.createProduct(saveProductDTO);
         log.info("product1: " + product1.toString());
         productEquals(saveProductDTO, product1);
-        localDateTimeEquals(product1.getCreationDate(), productService.getProductById(product1.getId()).getCreationDate());
+        Assertions.assertEquals(product1.getCreationDate(), productService.getProductById(product1.getId()).getCreationDate());
     }
 
     /**
@@ -163,17 +165,17 @@ class MediasoftApplicationTests {
         final Product product1 = productService.createProduct(saveProductDTO);
         log.info("product1: " + product1.toString());
         saveProductDTO.setName("Product1 updated");
-        saveProductDTO.setCategory("Category1 updated");
+        saveProductDTO.setCategory(CategoryType.ELECTRONICS);
         saveProductDTO.setDescription("Description1 updated");
-        saveProductDTO.setQuantity(15);
-        saveProductDTO.setPrice(1500.1);
+        saveProductDTO.setQuantity(15L);
+        saveProductDTO.setPrice(BigDecimal.valueOf(1500.1));
         saveProductDTO.setArticle("Product-1 updated");
         final Product product2 = productService.updateProduct(product1.getId(), saveProductDTO);
         log.info("product2: " + product2.toString());
 
         Assertions.assertEquals(product1.getId(), product2.getId());
         Assertions.assertNotEquals(product1, product2);
-        localDateTimeEquals(product1.getCreationDate(), product2.getCreationDate());
+        Assertions.assertEquals(product1.getCreationDate(), productService.getProductById(product1.getId()).getCreationDate());
         Assertions.assertNotNull(product1.getLastQuantityChangeDate());
         Assertions.assertNotNull(product2.getLastQuantityChangeDate());
     }

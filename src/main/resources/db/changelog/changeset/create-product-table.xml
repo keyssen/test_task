@@ -22,13 +22,13 @@
             <column name="price" type="numeric(10,2)">
                 <constraints nullable="false"/>
             </column>
-            <column name="quantity" type="integer">
+            <column name="quantity" type="bigint">
                 <constraints nullable="false"/>
             </column>
             <column name="last_quantity_change_date" type="timestamp(6)">
                 <constraints nullable="false"/>
             </column>
-            <column name="creation_date" type="timestamp(6)">
+            <column name="creation_date" type="date">
                 <constraints nullable="false"/>
             </column>
         </createTable>

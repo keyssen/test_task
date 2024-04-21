@@ -1,17 +1,20 @@
 package com.task.mediasoft.util.error;
 
 
+import com.task.mediasoft.product.exception.ErrorDetails;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionByArticle;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionById;
-import com.task.mediasoft.util.validation.ValidationException;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -28,9 +31,11 @@ public class AdviceController {
      * @return ResponseEntity с сообщением об ошибке и статусом NOT_FOUND.
      */
     @ExceptionHandler({ProductNotFoundExceptionById.class, ProductNotFoundExceptionByArticle.class})
-    public ResponseEntity<Object> handleException(Throwable e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<Object> handleProductNotFoundExceptionById(RuntimeException e) {
+        final ErrorDetails errorDetails = new ErrorDetails(e.getStackTrace()[0].getClassName(), e.getClass().getSimpleName(), e.getMessage(), LocalDateTime.now());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDetails);
     }
+
 
     /**
      * Обработчик исключения MethodArgumentNotValidException при автоматической валидации данных.
@@ -41,12 +46,13 @@ public class AdviceController {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleBindException(MethodArgumentNotValidException e) {
-        final ValidationException validationException = new ValidationException(
-                e.getBindingResult().getAllErrors().stream()
-                        .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                        .collect(Collectors.toSet()));
+        final BindingResult bindingResult = e.getBindingResult();
+        final List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+        final String errorMessages = fieldErrors.stream().map(fieldError -> fieldError.getField() + " " + fieldError.getDefaultMessage()).collect(Collectors.joining("; "));
 
-        return new ResponseEntity<>(validationException.getMessage(), HttpStatus.BAD_REQUEST);
+        final ErrorDetails errorDetails = new ErrorDetails(e.getObjectName(), e.getClass().getSimpleName(), errorMessages, LocalDateTime.now());
+
+        return ResponseEntity.badRequest().body(errorDetails);
     }
 
 
@@ -60,7 +66,7 @@ public class AdviceController {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleUnknownException(Throwable e) {
-        e.printStackTrace();
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        final ErrorDetails errorDetails = new ErrorDetails(e.getStackTrace()[0].getClassName(), e.getClass().getSimpleName(), e.getMessage(), LocalDateTime.now());
+        return ResponseEntity.internalServerError().body(errorDetails);
     }
 }

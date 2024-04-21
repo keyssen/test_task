@@ -1,9 +1,12 @@
 package com.task.mediasoft.product.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.task.mediasoft.product.model.CategoryType;
 import com.task.mediasoft.product.model.Product;
 import lombok.Getter;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -36,17 +39,17 @@ public class ViewProductDTO {
     /**
      * Категория продукта.
      */
-    private final String category;
+    private final CategoryType category;
 
     /**
      * Цена продукта.
      */
-    private final Double price;
+    private final BigDecimal price;
 
     /**
      * Количество продукта.
      */
-    private final Integer quantity;
+    private final Long quantity;
 
     /**
      * Дата последнего изменения количества продукта.
@@ -57,11 +60,12 @@ public class ViewProductDTO {
     /**
      * Дата создания продукта.
      */
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
-    private final LocalDateTime creationDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private final LocalDate creationDate;
 
     /**
      * Конструктор для создания объекта ViewProductDTO.
+     *
      * @param product Объект Product, на основе которого создается ViewProductDTO.
      */
     public ViewProductDTO(Product product) {

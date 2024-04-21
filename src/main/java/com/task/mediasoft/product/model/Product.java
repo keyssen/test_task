@@ -3,15 +3,24 @@ package com.task.mediasoft.product.model;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.UuidGenerator;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -20,69 +29,77 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "product")
+@Builder
 public class Product {
     /**
      * Уникальный идентификатор продукта.
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @UuidGenerator
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     /**
      * Артикул продукта.
      */
     @NonNull
-    @Column(nullable = false, unique = true)
+    @Column(name = "article", nullable = false, updatable = false, unique = true)
     private String article;
 
     /**
      * Наименование продукта.
      */
     @NonNull
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     /**
      * Описание продукта.
      */
     @NonNull
-    @Column(nullable = false)
+    @Column(name = "description", nullable = false)
     private String description;
 
     /**
      * Категория продукта.
      */
     @NonNull
-    @Column(nullable = false)
-    private String category;
+    @Column(name = "category", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CategoryType category;
 
     /**
      * Цена продукта.
      */
     @NonNull
-    @Column(nullable = false, columnDefinition = "numeric(10,2)")
-    private Double price;
+    @Column(name = "price", nullable = false)
+    private BigDecimal price;
 
     /**
      * Количество продукта.
      */
     @NonNull
-    @Column(nullable = false)
-    private Integer quantity;
+    @Column(name = "quantity", nullable = false)
+    private Long quantity;
 
     /**
      * Дата последнего изменения количества продукта.
      */
     @NonNull
+    @UpdateTimestamp
     @Column(name = "last_quantity_change_date", nullable = false)
     private LocalDateTime lastQuantityChangeDate;
 
     /**
      * Дата создания продукта.
      */
+    @NonNull
+    @CreationTimestamp
     @Column(name = "creation_date", updatable = false, nullable = false)
-    private LocalDateTime creationDate;
+    private LocalDate creationDate;
 
     /**
      * Конструктор для создания нового продукта  на основе объекта {@link SaveProductDTO}.
@@ -97,4 +114,22 @@ public class Product {
         this.price = saveProductDTO.getPrice();
         this.quantity = saveProductDTO.getQuantity();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return Objects.equals(getId(), product.getId()) && Objects.equals(getArticle(), product.getArticle()) &&
+                Objects.equals(getName(), product.getName()) && Objects.equals(getDescription(), product.getDescription()) &&
+                getCategory() == product.getCategory() && Objects.equals(getPrice(), product.getPrice()) &&
+                Objects.equals(getQuantity(), product.getQuantity()) && Objects.equals(getLastQuantityChangeDate(), product.getLastQuantityChangeDate()) &&
+                Objects.equals(getCreationDate(), product.getCreationDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getArticle(), getName(), getDescription(), getCategory(), getPrice(), getQuantity(), getLastQuantityChangeDate(), getCreationDate());
+    }
+
 }
