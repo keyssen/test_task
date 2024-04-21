@@ -10,7 +10,7 @@
                    'Product ' || s,
                    'Article ' || s,
                    'Description ' || s,
-                   'Category',
+                   'CLOTHING',
                    100.0,
                    50,
                    NOW(),

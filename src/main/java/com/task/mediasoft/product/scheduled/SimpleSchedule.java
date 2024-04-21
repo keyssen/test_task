@@ -12,6 +12,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 /**
@@ -25,8 +27,6 @@ import java.util.List;
 @ConditionalOnExpression("${app.scheduling.enabled:false} and !${app.scheduling.optimization:false}")
 @Profile("prod")
 public class SimpleSchedule {
-
-
     /**
      * Репозиторий для доступа к данным о продуктах
      */
@@ -35,8 +35,8 @@ public class SimpleSchedule {
     /**
      * Процент увеличения цены продукта
      */
-    @Value("${app.scheduling.priceIncreasePercentage}")
-    private double priceIncreasePercentage;
+    @Value("#{new java.math.BigDecimal('${app.scheduling.priceIncreasePercentage:10}')}")
+    private BigDecimal priceIncreasePercentage;
 
     /**
      * Запланированное задание для обновления цен продуктов.
@@ -46,10 +46,20 @@ public class SimpleSchedule {
     @MeasureExecutionTime
     public void scheduleFixedDelayTask() {
         log.info("START SimpleSchedule");
-        double coefficient = 1 + priceIncreasePercentage / 100;
         final List<Product> productList = productRepository.findAll();
-        productList.forEach(product -> product.setPrice(product.getPrice() * coefficient));
+        productList.forEach(product -> product.setPrice(getNewPrice(product.getPrice(), priceIncreasePercentage)));
         productRepository.saveAll(productList);
         log.info("END SimpleSchedule");
+    }
+
+    /**
+     * Вычисляет новую цену на основе старой цены и процентного повышения.
+     *
+     * @param oldPrice Старая цена продукта.
+     * @param increase Процентное повышение.
+     * @return Новая цена после применения повышения.
+     */
+    private BigDecimal getNewPrice(BigDecimal oldPrice, BigDecimal increase) {
+        return oldPrice.multiply(BigDecimal.ONE.add(increase.divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP)));
     }
 }

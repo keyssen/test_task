@@ -16,6 +16,8 @@ import javax.sql.DataSource;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -34,14 +36,13 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnExpression("${app.scheduling.enabled:false} and ${app.scheduling.optimization:false}")
-//@ConditionalOnExpression(value = "#{'${app.scheduling.mode:none}'.equals('optimization') and !${app.scheduling.optimization.spring-batch:false}}")
 @Profile("prod")
 public class OptimizedSchedule {
     /**
      * Процент увеличения цены продукта
      */
-    @Value("${app.scheduling.priceIncreasePercentage}")
-    private double priceIncreasePercentage;
+    @Value("#{new java.math.BigDecimal('${app.scheduling.priceIncreasePercentage:10}')}")
+    private BigDecimal priceIncreasePercentage;
 
     /**
      * Источник данных для управления подключением к базе данных
@@ -55,9 +56,6 @@ public class OptimizedSchedule {
 
     /**
      * Запланированная задача для обновления цен продуктов.
-     *
-     * @throws SQLException если возникают проблемы с доступом к базе данных.
-     * @throws IOException  если возникают проблемы с записью в файл.
      */
     @Scheduled(fixedDelayString = "${app.scheduling.period}")
     @MeasureExecutionTime
@@ -78,15 +76,14 @@ public class OptimizedSchedule {
 
                 int columnCount = resultSet.getMetaData().getColumnCount();
                 int count = 0;
-                double coefficient = 1 + priceIncreasePercentage / 100;
                 while (resultSet.next()) {
                     UUID id = (UUID) resultSet.getObject("id");
-                    double currentPrice = resultSet.getDouble("price");
-                    double newPrice = currentPrice * coefficient;
+                    BigDecimal currentPrice = resultSet.getBigDecimal("price");
+                    BigDecimal newPrice = getNewPrice(currentPrice, priceIncreasePercentage);
 
                     writer.write(productToString(resultSet, columnCount));
                     writer.newLine();
-                    updateStatement.setDouble(1, newPrice);
+                    updateStatement.setBigDecimal(1, newPrice);
                     updateStatement.setObject(2, id);
                     updateStatement.addBatch();
                     count++;
@@ -108,6 +105,16 @@ public class OptimizedSchedule {
         }
     }
 
+    /**
+     * Создает строковое представление продукта на основе переданного ResultSet.
+     * Этот метод конкатенирует значения столбцов из ResultSet в одну строку,
+     * разделенную запятыми.
+     *
+     * @param resultSet   ResultSet, содержащий данные о продукте.
+     * @param columnCount Количество столбцов в ResultSet.
+     * @return Строковое представление продукта.
+     * @throws SQLException Если происходит ошибка в базе данных.
+     */
     private String productToString(ResultSet resultSet, int columnCount) throws SQLException {
         StringBuilder row = new StringBuilder();
         for (int i = 1; i <= columnCount; i++) {
@@ -118,5 +125,16 @@ public class OptimizedSchedule {
             }
         }
         return row.toString();
+    }
+
+    /**
+     * Вычисляет новую цену на основе старой цены и процентного повышения.
+     *
+     * @param oldPrice Старая цена продукта.
+     * @param increase Процентное повышение.
+     * @return Новая цена после применения повышения.
+     */
+    private BigDecimal getNewPrice(BigDecimal oldPrice, BigDecimal increase) {
+        return oldPrice.multiply(BigDecimal.ONE.add(increase.divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP)));
     }
 }
