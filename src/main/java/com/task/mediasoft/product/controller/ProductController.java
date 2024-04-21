@@ -1,5 +1,6 @@
 package com.task.mediasoft.product.controller;
 
+import com.task.mediasoft.product.model.dto.ProductFilterDto;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.model.dto.ViewProductDTO;
 import com.task.mediasoft.product.service.ProductService;
@@ -46,6 +47,21 @@ public class ProductController {
                                                               @RequestParam(required = false) String search) {
         try {
             Page<ViewProductDTO> products = productService.getAllProducts(page, size, search).map(ViewProductDTO::new);
+            Map<String, Object> response = new HashMap<>();
+            response.put("products", products.get().toList());
+            response.put("totalItems", products.getTotalElements());
+            response.put("totalPages", products.getTotalPages());
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Map<String, Object>> searchProducts(@Valid ProductFilterDto filter) {
+        try {
+            System.out.println(filter);
+            Page<ViewProductDTO> products = productService.searchProducts(filter).map(ViewProductDTO::new);
             Map<String, Object> response = new HashMap<>();
             response.put("products", products.get().toList());
             response.put("totalItems", products.getTotalElements());

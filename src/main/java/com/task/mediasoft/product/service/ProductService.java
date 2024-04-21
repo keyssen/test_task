@@ -4,16 +4,21 @@ import com.task.mediasoft.product.exception.ProductNotFoundExceptionByArticle;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionById;
 import com.task.mediasoft.product.exception.ProductWithArticleAlreadyExistsException;
 import com.task.mediasoft.product.model.Product;
+import com.task.mediasoft.product.model.dto.ProductFilterDto;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.repository.ProductRepository;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -39,6 +44,28 @@ public class ProductService {
             return productRepository.findProducts(PageRequest.of(page - 1, size, Sort.by("id")), search);
         }
         return productRepository.findAll(PageRequest.of(page - 1, size, Sort.by("id")));
+    }
+
+    @Transactional
+    public Page<Product> searchProducts(final ProductFilterDto filter) {
+        final PageRequest pageRequest = PageRequest.of(filter.getPage(), filter.getSize());
+
+        final Specification<Product> specification = (root, query, criterialBuilder) -> {
+            final List<Predicate> predicates = new ArrayList<>();
+            if (filter.getId() != null) {
+                predicates.add(criterialBuilder.equal(root.get("id"), filter.getId()));
+            }
+            if (filter.getName() != null) {
+                predicates.add(criterialBuilder.like(root.get("name"), "%" + filter.getName() + "%"));
+            }
+            if (filter.getPrice() != null) {
+                predicates.add(criterialBuilder.lessThanOrEqualTo(root.get("price"), filter.getPrice()));
+            }
+            return criterialBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+        final Page<Product> products = productRepository.findAll(specification, pageRequest);
+
+        return products;
     }
 
     /**
