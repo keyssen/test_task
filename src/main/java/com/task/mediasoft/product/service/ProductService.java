@@ -4,13 +4,15 @@ import com.task.mediasoft.product.exception.ProductNotFoundExceptionByArticle;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionById;
 import com.task.mediasoft.product.exception.ProductWithArticleAlreadyExistsException;
 import com.task.mediasoft.product.model.Product;
-import com.task.mediasoft.product.model.dto.ProductFilterDto;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.repository.ProductRepository;
+import com.task.mediasoft.product.service.searchCriteria.CriteriaMethods;
+import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -46,27 +48,41 @@ public class ProductService {
         return productRepository.findAll(PageRequest.of(page - 1, size, Sort.by("id")));
     }
 
+    /**
+     * Поиск продуктов с использованием Criteria API и применением критериев поиска.
+     * Метод осуществляет поиск продуктов в базе данных с использованием JPA Criteria API.
+     *
+     * @param pageable       объект, предоставляющий информацию о странице и сортировке результатов
+     * @param searchCriteria список критериев поиска, которые будут применены к запросу
+     * @return страница продуктов, удовлетворяющих заданным критериям поиска
+     */
     @Transactional
-    public Page<Product> searchProducts(final ProductFilterDto filter) {
-        final PageRequest pageRequest = PageRequest.of(filter.getPage(), filter.getSize());
-
-        final Specification<Product> specification = (root, query, criterialBuilder) -> {
+    public Page<Product> searchProductsCriteriaApi(Pageable pageable, List<SearchCriterial<?>> searchCriteria) {
+        final Specification<Product> specification = (root, query, criteriaBuilder) -> {
             final List<Predicate> predicates = new ArrayList<>();
-            if (filter.getId() != null) {
-                predicates.add(criterialBuilder.equal(root.get("id"), filter.getId()));
-            }
-            if (filter.getName() != null) {
-                predicates.add(criterialBuilder.like(root.get("name"), "%" + filter.getName() + "%"));
-            }
-            if (filter.getPrice() != null) {
-                predicates.add(criterialBuilder.lessThanOrEqualTo(root.get("price"), filter.getPrice()));
-            }
-            return criterialBuilder.and(predicates.toArray(new Predicate[0]));
+            searchCriteria.forEach(searchCriterial -> {
+                switch (CriteriaMethods.operationToEnum(searchCriterial.getOperation())) {
+                    case EQUAL:
+                        predicates.add(searchCriterial.equal(root, criteriaBuilder));
+                        break;
+                    case GREATER_THAN_OR_EQ:
+                        predicates.add(searchCriterial.greaterThanOrEqualTo(root, criteriaBuilder));
+                        break;
+                    case LESS_THAN_OR_EQ:
+                        predicates.add(searchCriterial.lessThanOrEqualTo(root, criteriaBuilder));
+                        break;
+                    case LIKE:
+                        predicates.add(searchCriterial.like(root, criteriaBuilder));
+                        break;
+                }
+            });
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
-        final Page<Product> products = productRepository.findAll(specification, pageRequest);
+        final Page<Product> products = productRepository.findAll(specification, pageable);
 
         return products;
     }
+
 
     /**
      * Получение продукта по идентификатору.
