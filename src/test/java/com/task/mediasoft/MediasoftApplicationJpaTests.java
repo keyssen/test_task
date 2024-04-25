@@ -79,30 +79,30 @@ class MediasoftApplicationJpaTests {
         String article = "Article";
         String name = "5";
 
+        List<SearchCriterial<?>> filters = new ArrayList<>();
+
         BigDecimalSearchCriterial quantityFilter = new BigDecimalSearchCriterial();
         quantityFilter.setField("quantity");
         quantityFilter.setOperation(">=");
         quantityFilter.setValue(quantity);
+        filters.add(quantityFilter);
 
         StringSearchCriterial articleFilter = new StringSearchCriterial();
         articleFilter.setField("article");
         articleFilter.setOperation(">=");
         articleFilter.setValue(article);
+        filters.add(articleFilter);
 
         StringSearchCriterial nameFilter = new StringSearchCriterial();
         nameFilter.setField("name");
         nameFilter.setOperation("<=");
         nameFilter.setValue(name);
+        filters.add(nameFilter);
 
         LocalDateTimeSearchCriterial localDateTimeFilter = new LocalDateTimeSearchCriterial();
         localDateTimeFilter.setField("lastQuantityChangeDate");
         localDateTimeFilter.setOperation("=");
         localDateTimeFilter.setValue(LocalDateTime.now());
-
-        List<SearchCriterial<?>> filters = new ArrayList<>();
-        filters.add(quantityFilter);
-        filters.add(articleFilter);
-        filters.add(nameFilter);
         filters.add(localDateTimeFilter);
 
         Page<Product> productsPage = productService.searchProductsCriteriaApi(PageRequest.of(0, 5), filters);
