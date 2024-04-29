@@ -5,4 +5,5 @@
 
     <include file="/db/changelog/changeset/create-product-table.xml"/>
 
+    <include file="/db/changelog/changeset/insert-products.xml"/>
 </databaseChangeLog>
