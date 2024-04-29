@@ -2,10 +2,10 @@ package com.task.mediasoft.product.service.searchCriteria.Criterial;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.task.mediasoft.product.model.Product;
+import com.task.mediasoft.product.service.searchCriteria.Predicate.PredicateStrategy;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 
 
 /**
@@ -15,7 +15,7 @@ import jakarta.persistence.criteria.Root;
  * @param <T> тип значения, к которому применяется критерий
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true, property = "field")
-@JsonSubTypes({@JsonSubTypes.Type(value = StringSearchCriterial.class, name = "id"),
+@JsonSubTypes({@JsonSubTypes.Type(value = UUIDSearchCriterial.class, name = "id"),
         @JsonSubTypes.Type(value = StringSearchCriterial.class, name = "article"),
         @JsonSubTypes.Type(value = StringSearchCriterial.class, name = "name"),
         @JsonSubTypes.Type(value = StringSearchCriterial.class, name = "description"),
@@ -68,39 +68,50 @@ public interface SearchCriterial<T> {
     void setOperation(String operation);
 
     /**
-     * Создает предикат для операции равенства.
+     * Retrieves the predicate strategy.
      *
-     * @param root            корневой элемент запроса
-     * @param criteriaBuilder объект CriteriaBuilder для создания предиката
-     * @return предикат для операции равенства
+     * @return The predicate strategy.
      */
-    Predicate equal(Root<Product> root, CriteriaBuilder criteriaBuilder);
+    /**
+     * Получает стратегию предиката.
+     *
+     * @return Стратегия предиката.
+     */
+    PredicateStrategy<T> getPredicateStrategy();
 
     /**
-     * Создает предикат для операции "больше или равно".
+     * Создает предикат для проверки равенства.
      *
-     * @param root            корневой элемент запроса
-     * @param criteriaBuilder объект CriteriaBuilder для создания предиката
-     * @return предикат для операции "больше или равно"
+     * @param expression      Выражение для сравнения.
+     * @param criteriaBuilder Строитель критериев.
+     * @return Предикат, проверяющий равенство.
      */
-    Predicate greaterThanOrEqualTo(Root<Product> root, CriteriaBuilder criteriaBuilder);
+    Predicate equal(Expression<T> expression, CriteriaBuilder criteriaBuilder);
 
     /**
-     * Создает предикат для операции "меньше или равно".
+     * Создает предикат для проверки больше или равно.
      *
-     * @param root            корневой элемент запроса
-     * @param criteriaBuilder объект CriteriaBuilder для создания предиката
-     * @return предикат для операции "меньше или равно"
+     * @param expression      Выражение для сравнения.
+     * @param criteriaBuilder Строитель критериев.
+     * @return Предикат, проверяющий больше или равно.
      */
-    Predicate lessThanOrEqualTo(Root<Product> root, CriteriaBuilder criteriaBuilder);
+    Predicate greaterThanOrEqualTo(Expression<T> expression, CriteriaBuilder criteriaBuilder);
 
     /**
-     * Создает предикат для операции подобно (LIKE).
+     * Создает предикат для проверки меньше или равно.
      *
-     * @param root            корневой элемент запроса
-     * @param criteriaBuilder объект CriteriaBuilder для создания предиката
-     * @return предикат для операции подобно (LIKE)
+     * @param expression      Выражение для сравнения.
+     * @param criteriaBuilder Строитель критериев.
+     * @return Предикат, проверяющий меньше или равно.
      */
-    Predicate like(Root<Product> root, CriteriaBuilder criteriaBuilder);
+    Predicate lessThanOrEqualTo(Expression<T> expression, CriteriaBuilder criteriaBuilder);
 
+    /**
+     * Создает предикат для проверки сходства с использованием оператора LIKE.
+     *
+     * @param expression      Выражение для сравнения.
+     * @param criteriaBuilder Строитель критериев.
+     * @return Предикат, проверяющий сходство с использованием оператора LIKE.
+     */
+    Predicate like(Expression<T> expression, CriteriaBuilder criteriaBuilder);
 }

@@ -1,9 +1,10 @@
 package com.task.mediasoft.product.service.searchCriteria.Criterial;
 
-import com.task.mediasoft.product.model.Product;
+import com.task.mediasoft.product.service.searchCriteria.Predicate.PredicateStrategy;
+import com.task.mediasoft.product.service.searchCriteria.Predicate.StringPredicateStrategy;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,53 +28,65 @@ public class StringSearchCriterial implements SearchCriterial<String> {
     private String operation;
 
     /**
-     * Создает предикат для операции равенства значения типа String.
+     * Класс, реализующий интерфейс PredicateStrategy для работы со строками.
+     */
+    private static PredicateStrategy<String> predicateStrategy = new StringPredicateStrategy();
+
+    /**
+     * Возвращает используемую стратегию предиката.
      *
-     * @param root            корневой элемент запроса
-     * @param criteriaBuilder объект CriteriaBuilder для создания предиката
-     * @return предикат для операции равенства
+     * @return Стратегия предиката для строк.
      */
     @Override
-    public Predicate equal(Root<Product> root, CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.equal(root.get(field).as(String.class), value);
+    public PredicateStrategy<String> getPredicateStrategy() {
+        return predicateStrategy;
     }
 
     /**
-     * Создает предикат для операции "больше или равно" значения типа String.
-     * Использует операцию LIKE для поиска значений, начинающихся с заданного значения.
+     * Создает предикат для проверки равенства строке.
      *
-     * @param root            корневой элемент запроса
-     * @param criteriaBuilder объект CriteriaBuilder для создания предиката
-     * @return предикат для операции "больше или равно"
+     * @param expression      Выражение для сравнения.
+     * @param criteriaBuilder Строитель критериев.
+     * @return Предикат, проверяющий равенство.
      */
     @Override
-    public Predicate greaterThanOrEqualTo(Root<Product> root, CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.like(root.get(field).as(String.class), value + "%");
+    public Predicate equal(Expression<String> expression, CriteriaBuilder criteriaBuilder) {
+        return getPredicateStrategy().equal(expression, value, criteriaBuilder);
     }
 
     /**
-     * Создает предикат для операции "меньше или равно" значения типа String.
-     * Использует операцию LIKE для поиска значений, заканчивающихся заданным значением.
+     * Создает предикат для проверки больше или равно строке.
      *
-     * @param root            корневой элемент запроса
-     * @param criteriaBuilder объект CriteriaBuilder для создания предиката
-     * @return предикат для операции "меньше или равно"
+     * @param expression      Выражение для сравнения.
+     * @param criteriaBuilder Строитель критериев.
+     * @return Предикат, проверяющий больше или равно.
      */
     @Override
-    public Predicate lessThanOrEqualTo(Root<Product> root, CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.like(root.get(field).as(String.class), "%" + value);
+    public Predicate greaterThanOrEqualTo(Expression<String> expression, CriteriaBuilder criteriaBuilder) {
+        return getPredicateStrategy().greaterThanOrEqualTo(expression, value, criteriaBuilder);
     }
 
     /**
-     * Создает предикат для операции подобно (LIKE) значения типа String.
-     * Использует операцию LIKE для поиска значений, содержащих заданное значение в любом месте.
+     * Создает предикат для проверки меньше или равно строке.
      *
-     * @param root            корневой элемент запроса
-     * @param criteriaBuilder объект CriteriaBuilder для создания предиката
-     * @return предикат для операции "подобно" (LIKE)
+     * @param expression      Выражение для сравнения.
+     * @param criteriaBuilder Строитель критериев.
+     * @return Предикат, проверяющий меньше или равно.
      */
     @Override
-    public Predicate like(Root<Product> root, CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.like(root.get(field).as(String.class), "%" + value + "%");
+    public Predicate lessThanOrEqualTo(Expression<String> expression, CriteriaBuilder criteriaBuilder) {
+        return getPredicateStrategy().lessThanOrEqualTo(expression, value, criteriaBuilder);
+    }
+
+    /**
+     * Создает предикат для проверки сходства с использованием оператора LIKE для строк.
+     *
+     * @param expression      Выражение для сравнения.
+     * @param criteriaBuilder Строитель критериев.
+     * @return Предикат, проверяющий сходство с использованием оператора LIKE.
+     */
+    @Override
+    public Predicate like(Expression<String> expression, CriteriaBuilder criteriaBuilder) {
+        return getPredicateStrategy().like(expression, value, criteriaBuilder);
     }
 }

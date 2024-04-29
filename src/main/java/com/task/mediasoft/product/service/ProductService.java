@@ -6,8 +6,8 @@ import com.task.mediasoft.product.exception.ProductWithArticleAlreadyExistsExcep
 import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.repository.ProductRepository;
-import com.task.mediasoft.product.service.searchCriteria.CriteriaMethods;
 import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
+import com.task.mediasoft.product.service.searchCriteria.Enums.OperationEnum;
 import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -61,18 +61,18 @@ public class ProductService {
         final Specification<Product> specification = (root, query, criteriaBuilder) -> {
             final List<Predicate> predicates = new ArrayList<>();
             searchCriteria.forEach(searchCriterial -> {
-                switch (CriteriaMethods.operationToEnum(searchCriterial.getOperation())) {
+                switch (OperationEnum.fromCode(searchCriterial.getOperation())) {
                     case EQUAL:
-                        predicates.add(searchCriterial.equal(root, criteriaBuilder));
+                        predicates.add(searchCriterial.equal(root.get(searchCriterial.getField()), criteriaBuilder));
                         break;
                     case GREATER_THAN_OR_EQ:
-                        predicates.add(searchCriterial.greaterThanOrEqualTo(root, criteriaBuilder));
+                        predicates.add(searchCriterial.greaterThanOrEqualTo(root.get(searchCriterial.getField()), criteriaBuilder));
                         break;
                     case LESS_THAN_OR_EQ:
-                        predicates.add(searchCriterial.lessThanOrEqualTo(root, criteriaBuilder));
+                        predicates.add(searchCriterial.lessThanOrEqualTo(root.get(searchCriterial.getField()), criteriaBuilder));
                         break;
                     case LIKE:
-                        predicates.add(searchCriterial.like(root, criteriaBuilder));
+                        predicates.add(searchCriterial.like(root.get(searchCriterial.getField()), criteriaBuilder));
                         break;
                 }
             });

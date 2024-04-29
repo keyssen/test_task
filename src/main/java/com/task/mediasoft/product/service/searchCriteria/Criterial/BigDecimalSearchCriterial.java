@@ -1,9 +1,10 @@
 package com.task.mediasoft.product.service.searchCriteria.Criterial;
 
-import com.task.mediasoft.product.model.Product;
+import com.task.mediasoft.product.service.searchCriteria.Predicate.BigDecimalPredicateStrategy;
+import com.task.mediasoft.product.service.searchCriteria.Predicate.PredicateStrategy;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,54 +33,65 @@ public class BigDecimalSearchCriterial implements SearchCriterial<BigDecimal> {
     private String operation;
 
     /**
-     * Создает предикат для операции равенства значения типа BigDecimal.
+     * Класс, реализующий интерфейс PredicateStrategy для работы с BigDecimal.
+     */
+    private static PredicateStrategy<BigDecimal> predicateStrategy = new BigDecimalPredicateStrategy();
+
+    /**
+     * Возвращает используемую стратегию предиката.
      *
-     * @param root            корневой элемент запроса
-     * @param criteriaBuilder объект CriteriaBuilder для создания предиката
-     * @return предикат для операции равенства
+     * @return Стратегия предиката для BigDecimal.
      */
     @Override
-    public Predicate equal(Root<Product> root, CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.equal(root.get(field), value);
+    public PredicateStrategy<BigDecimal> getPredicateStrategy() {
+        return predicateStrategy;
     }
 
     /**
-     * Создает предикат для операции "больше или равно" значения типа BigDecimal.
+     * Создает предикат для проверки равенства значению BigDecimal.
      *
-     * @param root            корневой элемент запроса
-     * @param criteriaBuilder объект CriteriaBuilder для создания предиката
-     * @return предикат для операции "больше или равно"
+     * @param expression      Выражение для сравнения.
+     * @param criteriaBuilder Строитель критериев.
+     * @return Предикат, проверяющий равенство.
      */
     @Override
-    public Predicate greaterThanOrEqualTo(Root<Product> root, CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.greaterThanOrEqualTo(root.get(field), value);
+    public Predicate equal(Expression<BigDecimal> expression, CriteriaBuilder criteriaBuilder) {
+        return getPredicateStrategy().equal(expression, value, criteriaBuilder);
     }
 
     /**
-     * Создает предикат для операции "меньше или равно" значения типа BigDecimal.
+     * Создает предикат для проверки больше или равно значению BigDecimal.
      *
-     * @param root            корневой элемент запроса
-     * @param criteriaBuilder объект CriteriaBuilder для создания предиката
-     * @return предикат для операции "меньше или равно"
+     * @param expression      Выражение для сравнения.
+     * @param criteriaBuilder Строитель критериев.
+     * @return Предикат, проверяющий больше или равно.
      */
     @Override
-    public Predicate lessThanOrEqualTo(Root<Product> root, CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.lessThanOrEqualTo(root.get(field), value);
+    public Predicate greaterThanOrEqualTo(Expression<BigDecimal> expression, CriteriaBuilder criteriaBuilder) {
+        return getPredicateStrategy().greaterThanOrEqualTo(expression, value, criteriaBuilder);
     }
 
     /**
-     * Создает предикат для операции "подобно" (LIKE) значения типа BigDecimal.
-     * В данном случае, ограничивает значение в диапазоне от 90% до 110% от заданного значения.
+     * Создает предикат для проверки меньше или равно значению BigDecimal.
      *
-     * @param root            корневой элемент запроса
-     * @param criteriaBuilder объект CriteriaBuilder для создания предиката
-     * @return предикат для операции "подобно" (LIKE)
+     * @param expression      Выражение для сравнения.
+     * @param criteriaBuilder Строитель критериев.
+     * @return Предикат, проверяющий меньше или равно.
      */
     @Override
-    public Predicate like(Root<Product> root, CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.and(
-                criteriaBuilder.greaterThanOrEqualTo(root.get(field), value.multiply(BigDecimal.valueOf(0.9))),
-                criteriaBuilder.lessThanOrEqualTo(root.get(field), value.multiply(BigDecimal.valueOf(1.1)))
-        );
+    public Predicate lessThanOrEqualTo(Expression<BigDecimal> expression, CriteriaBuilder criteriaBuilder) {
+        return getPredicateStrategy().lessThanOrEqualTo(expression, value, criteriaBuilder);
+    }
+
+    /**
+     * Создает предикат для проверки сходства с использованием оператора LIKE для BigDecimal.
+     *
+     * @param expression      Выражение для сравнения.
+     * @param criteriaBuilder Строитель критериев.
+     * @return Предикат, проверяющий сходство с использованием оператора LIKE.
+     */
+    @Override
+    public Predicate like(Expression<BigDecimal> expression, CriteriaBuilder criteriaBuilder) {
+        return getPredicateStrategy().like(expression, value, criteriaBuilder);
     }
 }

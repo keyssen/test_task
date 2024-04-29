@@ -1,19 +1,20 @@
 package com.task.mediasoft.product.service.searchCriteria.Criterial;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.task.mediasoft.product.service.searchCriteria.Predicate.LocalDateTimePredicateStrategy;
+
 import com.task.mediasoft.product.service.searchCriteria.Predicate.PredicateStrategy;
+import com.task.mediasoft.product.service.searchCriteria.Predicate.UUIDPredicateStrategy;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.util.UUID;
 
-@Getter
 @Setter
-public class LocalDateTimeSearchCriterial implements SearchCriterial<LocalDateTime> {
+@Getter
+public class UUIDSearchCriterial implements SearchCriterial<UUID> {
+
     /**
      * Поле, к которому применяется критерий.
      */
@@ -22,8 +23,7 @@ public class LocalDateTimeSearchCriterial implements SearchCriterial<LocalDateTi
     /**
      * Значение критерия.
      */
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd' 'HH:mm:ss")
-    private LocalDateTime value;
+    private UUID value;
 
     /**
      * Операция, которая будет применена к критерию.
@@ -31,65 +31,65 @@ public class LocalDateTimeSearchCriterial implements SearchCriterial<LocalDateTi
     private String operation;
 
     /**
-     * Класс, реализующий интерфейс PredicateStrategy для работы с LocalDateTime.
+     * Класс, реализующий интерфейс PredicateStrategy для работы с UUID.
      */
-    private static PredicateStrategy<LocalDateTime> predicateStrategy = new LocalDateTimePredicateStrategy();
+    private static PredicateStrategy<UUID> predicateStrategy = new UUIDPredicateStrategy();
 
     /**
      * Возвращает используемую стратегию предиката.
      *
-     * @return Стратегия предиката для LocalDateTime.
+     * @return Стратегия предиката для UUID.
      */
     @Override
-    public PredicateStrategy<LocalDateTime> getPredicateStrategy() {
+    public PredicateStrategy<UUID> getPredicateStrategy() {
         return predicateStrategy;
     }
 
     /**
-     * Создает предикат для проверки равенства значению LocalDateTime.
+     * Создает предикат для проверки равенства UUID.
      *
      * @param expression      Выражение для сравнения.
      * @param criteriaBuilder Строитель критериев.
      * @return Предикат, проверяющий равенство.
      */
     @Override
-    public Predicate equal(Expression<LocalDateTime> expression, CriteriaBuilder criteriaBuilder) {
+    public Predicate equal(Expression<UUID> expression, CriteriaBuilder criteriaBuilder) {
         return getPredicateStrategy().equal(expression, value, criteriaBuilder);
     }
 
     /**
-     * Создает предикат для проверки больше или равно значению LocalDateTime.
+     * Создает предикат для проверки больше или равно UUID.
      *
      * @param expression      Выражение для сравнения.
      * @param criteriaBuilder Строитель критериев.
      * @return Предикат, проверяющий больше или равно.
      */
     @Override
-    public Predicate greaterThanOrEqualTo(Expression<LocalDateTime> expression, CriteriaBuilder criteriaBuilder) {
+    public Predicate greaterThanOrEqualTo(Expression<UUID> expression, CriteriaBuilder criteriaBuilder) {
         return getPredicateStrategy().greaterThanOrEqualTo(expression, value, criteriaBuilder);
     }
 
     /**
-     * Создает предикат для проверки меньше или равно значению LocalDateTime.
+     * Создает предикат для проверки меньше или равно UUID.
      *
      * @param expression      Выражение для сравнения.
      * @param criteriaBuilder Строитель критериев.
      * @return Предикат, проверяющий меньше или равно.
      */
     @Override
-    public Predicate lessThanOrEqualTo(Expression<LocalDateTime> expression, CriteriaBuilder criteriaBuilder) {
+    public Predicate lessThanOrEqualTo(Expression<UUID> expression, CriteriaBuilder criteriaBuilder) {
         return getPredicateStrategy().lessThanOrEqualTo(expression, value, criteriaBuilder);
     }
 
     /**
-     * Создает предикат для проверки сходства с использованием оператора LIKE для LocalDateTime.
+     * Создает предикат для проверки сходства с использованием оператора LIKE для UUID.
      *
      * @param expression      Выражение для сравнения.
      * @param criteriaBuilder Строитель критериев.
      * @return Предикат, проверяющий сходство с использованием оператора LIKE.
      */
     @Override
-    public Predicate like(Expression<LocalDateTime> expression, CriteriaBuilder criteriaBuilder) {
+    public Predicate like(Expression<UUID> expression, CriteriaBuilder criteriaBuilder) {
         return getPredicateStrategy().like(expression, value, criteriaBuilder);
     }
 }

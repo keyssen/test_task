@@ -1,5 +1,6 @@
 package com.task.mediasoft.product.controller;
 
+import com.task.mediasoft.product.controller.model.ProductPaginationModel;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.model.dto.ViewProductDTO;
 import com.task.mediasoft.product.service.ProductService;
@@ -20,9 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -45,35 +44,19 @@ public class ProductController {
      * @return Ответ с данными о продуктах.
      */
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getAllProducts(@RequestParam(defaultValue = "1") int page,
-                                                              @RequestParam(defaultValue = "5") int size,
-                                                              @RequestParam(required = false) String search) {
-        try {
-            Page<ViewProductDTO> products = productService.getAllProducts(page, size, search).map(ViewProductDTO::new);
-            Map<String, Object> response = new HashMap<>();
-            response.put("products", products.get().toList());
-            response.put("totalItems", products.getTotalElements());
-            response.put("totalPages", products.getTotalPages());
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<ProductPaginationModel> getAllProducts(@RequestParam(defaultValue = "1") int page,
+                                                                 @RequestParam(defaultValue = "5") int size,
+                                                                 @RequestParam(required = false) String search) {
+        Page<ViewProductDTO> products = productService.getAllProducts(page, size, search).map(ViewProductDTO::new);
+        ProductPaginationModel response = new ProductPaginationModel(products.get().toList(), products.getTotalElements(), products.getTotalPages());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/search")
-    public ResponseEntity<Map<String, Object>> searchProducts(Pageable pageable, @Valid @RequestBody List<SearchCriterial<?>> searchCriteria) {
-        try {
-            Page<ViewProductDTO> products = productService.searchProductsCriteriaApi(pageable, searchCriteria).map(ViewProductDTO::new);
-            Map<String, Object> response = new HashMap<>();
-            response.put("products", products.get().toList());
-            response.put("totalItems", products.getTotalElements());
-            response.put("totalPages", products.getTotalPages());
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<ProductPaginationModel> searchProducts(Pageable pageable, @Valid @RequestBody List<SearchCriterial<?>> searchCriteria) {
+        Page<ViewProductDTO> products = productService.searchProductsCriteriaApi(pageable, searchCriteria).map(ViewProductDTO::new);
+        ProductPaginationModel response = new ProductPaginationModel(products.get().toList(), products.getTotalElements(), products.getTotalPages());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
