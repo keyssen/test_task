@@ -1,5 +1,6 @@
 package com.task.mediasoft.product.controller;
 
+import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.model.dto.ViewProductDTO;
 import com.task.mediasoft.product.service.ProductService;
@@ -7,6 +8,7 @@ import com.task.mediasoft.session.CurrencyProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,7 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -47,11 +52,21 @@ public class ProductController {
                                                               @RequestParam(defaultValue = "5") int size,
                                                               @RequestParam(required = false) String search) {
         try {
-            Page<ViewProductDTO> products = productService.getAllProducts(page, size, search).map(ViewProductDTO::new);
+            Page<Product> products = productService.getAllProducts(page, size, search);
+            List<ViewProductDTO> viewProducts = new ArrayList<>();
+            BigDecimal currencyPrice = productService.getCurrency();
+            String currency = currencyProvider.getCurrency();
+            for (Product product : productService.getAllProducts(page, size, search)) {
+                ViewProductDTO viewProductDTO = new ViewProductDTO(product);
+                viewProductDTO.setPrice(productService.getNewPrice(product.getPrice(), currencyPrice));
+                viewProductDTO.setCurrency(currency);
+                viewProducts.add(viewProductDTO);
+            }
+            Page<ViewProductDTO> viewPage = new PageImpl<>(viewProducts, products.getPageable(), products.getTotalElements());
             Map<String, Object> response = new HashMap<>();
-            response.put("products", products.get().toList());
-            response.put("totalItems", products.getTotalElements());
-            response.put("totalPages", products.getTotalPages());
+            response.put("products", viewPage.get().toList());
+            response.put("totalItems", viewPage.getTotalElements());
+            response.put("totalPages", viewPage.getTotalPages());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);

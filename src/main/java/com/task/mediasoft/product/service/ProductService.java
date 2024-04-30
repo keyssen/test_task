@@ -64,7 +64,7 @@ public class ProductService {
     public Product getProductById(UUID id) {
         final Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundExceptionById(id));
-        product.setPrice(product.getPrice().divide(getCurrency(), 2, BigDecimal.ROUND_HALF_UP));
+        product.setPrice(getNewPrice(product.getPrice(), getCurrency()));
         return product;
     }
 
@@ -79,7 +79,7 @@ public class ProductService {
     public Product getProductByArticle(String article) {
         final Product product = productRepository.findByArticleEquals(article)
                 .orElseThrow(() -> new ProductNotFoundExceptionByArticle(article));
-        product.setPrice(product.getPrice().divide(getCurrency(), 2, BigDecimal.ROUND_HALF_UP));
+        product.setPrice(getNewPrice(product.getPrice(), getCurrency()));
         return product;
     }
 
@@ -169,5 +169,9 @@ public class ProductService {
         } finally {
             return currency;
         }
+    }
+
+    public BigDecimal getNewPrice(BigDecimal price, BigDecimal currency) {
+        return price.divide(currency, 2, BigDecimal.ROUND_HALF_UP);
     }
 }
