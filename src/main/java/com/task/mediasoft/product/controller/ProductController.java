@@ -3,6 +3,7 @@ package com.task.mediasoft.product.controller;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.model.dto.ViewProductDTO;
 import com.task.mediasoft.product.service.ProductService;
+import com.task.mediasoft.session.CurrencyProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,6 +32,7 @@ import java.util.UUID;
 public class ProductController {
 
     private final ProductService productService;
+    private final CurrencyProvider currencyProvider;
 
     /**
      * Получает список всех продуктов с пагинацией и поиском.
@@ -75,7 +77,9 @@ public class ProductController {
      */
     @GetMapping("/{id}")
     public ViewProductDTO getProductById(@PathVariable UUID id) {
-        return new ViewProductDTO(productService.getProductById(id));
+        ViewProductDTO viewProductDTO = new ViewProductDTO(productService.getProductById(id));
+        viewProductDTO.setCurrency(currencyProvider.getCurrency());
+        return viewProductDTO;
     }
 
 

@@ -1,19 +1,28 @@
 package com.task.mediasoft.product.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionByArticle;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionById;
 import com.task.mediasoft.product.exception.ProductWithArticleAlreadyExistsException;
 import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.repository.ProductRepository;
+import com.task.mediasoft.product.service.currencyService.CurrencyServiceClient;
+import com.task.mediasoft.session.CurrencyProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -24,6 +33,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final CurrencyServiceClient currencyServiceClient;
+    private final CurrencyProvider currencyProvider;
 
     /**
      * Получение продуктов с возможностью поиска по строке.
@@ -33,6 +44,7 @@ public class ProductService {
      * @param search Строка поиска по имени продукта.
      * @return Страница продуктов.
      */
+
     @Transactional(readOnly = true)
     public Page<Product> getAllProducts(int page, int size, String search) {
         if (search != null && !search.isEmpty()) {
@@ -48,10 +60,12 @@ public class ProductService {
      * @return Найденный продукт.
      * @throws ProductNotFoundExceptionById если продукт не найден.
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public Product getProductById(UUID id) {
-        return productRepository.findById(id)
+        final Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundExceptionById(id));
+        product.setPrice(product.getPrice().divide(getCurrency(), 2, BigDecimal.ROUND_HALF_UP));
+        return product;
     }
 
     /**
@@ -63,7 +77,10 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public Product getProductByArticle(String article) {
-        return productRepository.findByArticleEquals(article).orElseThrow(() -> new ProductNotFoundExceptionByArticle(article));
+        final Product product = productRepository.findByArticleEquals(article)
+                .orElseThrow(() -> new ProductNotFoundExceptionByArticle(article));
+        product.setPrice(product.getPrice().divide(getCurrency(), 2, BigDecimal.ROUND_HALF_UP));
+        return product;
     }
 
     /**
@@ -128,5 +145,29 @@ public class ProductService {
     @Transactional
     public void deleteAllProduct() {
         productRepository.deleteAll();
+    }
+
+    public BigDecimal getCurrency() {
+        BigDecimal currency = new BigDecimal(1);
+        try {
+            Map<String, BigDecimal> map = currencyServiceClient.someRestCall();
+            System.out.println(map);
+            BigDecimal currencyServices = map.get(currencyProvider.getCurrency());
+            if (currencyServices != null) {
+                currency = currencyServices;
+            }
+        } catch (WebClientResponseException e) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                JsonNode currencyJsonNode = objectMapper.readTree(new File("exchange-rate.json")).get(currencyProvider.getCurrency());
+                if (currency != null) {
+                    currency = new BigDecimal(currencyJsonNode.asText());
+                }
+            } catch (IOException iOException) {
+                iOException.printStackTrace();
+            }
+        } finally {
+            return currency;
+        }
     }
 }

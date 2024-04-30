@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.task.mediasoft.product.model.CategoryType;
 import com.task.mediasoft.product.model.Product;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,54 +15,60 @@ import java.util.UUID;
  * Data Transfer Object (DTO) для отображения информации о продукте.
  */
 @Getter
+@Setter
 public class ViewProductDTO {
 
     /**
      * Идентификатор продукта.
      */
-    private final UUID id;
+    private UUID id;
 
     /**
      * Артикул продукта.
      */
-    private final String article;
+    private String article;
 
     /**
      * Наименование продукта.
      */
-    private final String name;
+    private String name;
 
     /**
      * Описание продукта.
      */
-    private final String description;
+    private String description;
 
     /**
      * Категория продукта.
      */
-    private final CategoryType category;
+    private CategoryType category;
 
     /**
      * Цена продукта.
      */
-    private final BigDecimal price;
+    private BigDecimal price;
 
     /**
      * Количество продукта.
      */
-    private final Long quantity;
+    private Long quantity;
 
     /**
      * Дата последнего изменения количества продукта.
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private final LocalDateTime lastQuantityChangeDate;
+    private LocalDateTime lastQuantityChangeDate;
 
     /**
      * Дата создания продукта.
      */
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private final LocalDate creationDate;
+    private LocalDate creationDate;
+
+    /**
+     * Валюта продукта.
+     */
+    private String currency;
 
     /**
      * Конструктор для создания объекта ViewProductDTO.
@@ -78,5 +85,6 @@ public class ViewProductDTO {
         this.quantity = product.getQuantity();
         this.lastQuantityChangeDate = product.getLastQuantityChangeDate();
         this.creationDate = product.getCreationDate();
+        this.currency = "RUB";
     }
 }
