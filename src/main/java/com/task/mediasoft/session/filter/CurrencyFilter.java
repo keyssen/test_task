@@ -21,20 +21,9 @@ public class CurrencyFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String currency = request.getHeader("currency");
-        if (currency != null && equalsEnum(currency)) {
+        if (currency != null && CurrencyEnum.equalsEnum(currency)) {
             currencyProvider.setCurrency(currency);
         }
-        logger.info("Successfully authenticated user  " + currency);
-        logger.info("Successfully authenticated user  " + currencyProvider.getCurrency());
         filterChain.doFilter(request, response);
-    }
-
-    private boolean equalsEnum(String currency) {
-        for (CurrencyEnum operationType : CurrencyEnum.values()) {
-            if (operationType.name().equals(currency)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

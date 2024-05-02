@@ -74,18 +74,20 @@ public class ProductController {
     }
 
     /**
-     * Получает продукт по его артикулу.
+     * Получает продукт по его артикулу и меняет валюту.
      *
      * @param article Артикул продукта.
      * @return Данные о продукте.
      */
     @GetMapping("/getProductByArticle/{article}")
     public ViewProductDTO getProductByArticle(@PathVariable String article) {
-        return new ViewProductDTO(productService.getProductByArticle(article));
+        ViewProductDTO viewProductDTO = new ViewProductDTO(productService.getProductByArticle(article));
+        viewProductDTO.setCurrency(currencyProvider.getCurrency());
+        return viewProductDTO;
     }
 
     /**
-     * Получает продукт по его идентификатору.
+     * Получает продукт по его идентификатору и меняет валюту.
      *
      * @param id Идентификатор продукта.
      * @return Данные о продукте.

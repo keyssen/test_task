@@ -4,5 +4,14 @@ public enum CurrencyEnum {
     RUB,
     CNY,
     USD,
-    EUR,
+    EUR;
+
+    public static boolean equalsEnum(String currency) {
+        for (CurrencyEnum operationType : CurrencyEnum.values()) {
+            if (operationType.name().equals(currency)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
