@@ -3,11 +3,11 @@ package com.task.mediasoft.orderProduct.model;
 import com.task.mediasoft.order.model.Order;
 import com.task.mediasoft.product.model.Product;
 import jakarta.persistence.Column;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,18 +23,16 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "order_product")
+@IdClass(OrderProductId.class)
 public class OrderProduct {
 
-    @EmbeddedId
-    private OrderProductId id;
-
+    @Id
     @ManyToOne
-    @MapsId("orderId")
     @JoinColumn(name = "orders_id")
     Order order;
 
+    @Id
     @ManyToOne
-    @MapsId("productId")
     @JoinColumn(name = "product_id")
     Product product;
 
@@ -48,11 +46,11 @@ public class OrderProduct {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof OrderProduct that)) return false;
-        return Objects.equals(getId(), that.getId()) && Objects.equals(getOrder(), that.getOrder()) && Objects.equals(getProduct(), that.getProduct()) && Objects.equals(getPrice(), that.getPrice()) && Objects.equals(getQuantity(), that.getQuantity());
+        return Objects.equals(getOrder(), that.getOrder()) && Objects.equals(getProduct(), that.getProduct()) && Objects.equals(getPrice(), that.getPrice()) && Objects.equals(getQuantity(), that.getQuantity());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getOrder(), getProduct(), getPrice(), getQuantity());
+        return Objects.hash(getOrder(), getProduct(), getPrice(), getQuantity());
     }
 }
