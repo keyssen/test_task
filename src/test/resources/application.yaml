@@ -6,6 +6,9 @@ spring:
     driverClassName: org.h2.Driver
 
   jpa:
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
     hibernate:
       ddl-auto: create
       show-sql: true

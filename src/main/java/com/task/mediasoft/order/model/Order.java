@@ -21,7 +21,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "product")
+@Table(name = "orders")
 public class Order {
     @Id
     @UuidGenerator

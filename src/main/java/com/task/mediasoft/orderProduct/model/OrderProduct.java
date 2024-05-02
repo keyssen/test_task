@@ -30,7 +30,7 @@ public class OrderProduct {
 
     @ManyToOne
     @MapsId("orderId")
-    @JoinColumn(name = "order_id")
+    @JoinColumn(name = "orders_id")
     Order order;
 
     @ManyToOne
@@ -47,8 +47,7 @@ public class OrderProduct {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof OrderProduct)) return false;
-        OrderProduct that = (OrderProduct) o;
+        if (!(o instanceof OrderProduct that)) return false;
         return Objects.equals(getId(), that.getId()) && Objects.equals(getOrder(), that.getOrder()) && Objects.equals(getProduct(), that.getProduct()) && Objects.equals(getPrice(), that.getPrice()) && Objects.equals(getQuantity(), that.getQuantity());
     }
 

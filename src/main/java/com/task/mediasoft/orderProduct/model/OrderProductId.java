@@ -17,7 +17,7 @@ import java.util.UUID;
 @Embeddable
 public class OrderProductId implements Serializable {
 
-    @Column(name = "order_id")
+    @Column(name = "orders_id")
     private UUID orderId;
 
     @Column(name = "product_id")
