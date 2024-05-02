@@ -1,6 +1,7 @@
 package com.task.mediasoft.product.controller;
 
 import com.task.mediasoft.product.model.Product;
+import com.task.mediasoft.product.controller.model.ProductPaginationModel;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.model.dto.ViewProductDTO;
 import com.task.mediasoft.product.service.ProductService;
@@ -48,29 +49,22 @@ public class ProductController {
      * @return Ответ с данными о продуктах.
      */
     @GetMapping
-    public ResponseEntity<Map<String, Object>> getAllProducts(@RequestParam(defaultValue = "1") int page,
-                                                              @RequestParam(defaultValue = "5") int size,
-                                                              @RequestParam(required = false) String search) {
-        try {
-            Page<Product> products = productService.getAllProducts(page, size, search);
-            List<ViewProductDTO> viewProducts = new ArrayList<>();
-            BigDecimal currencyPrice = productService.getCurrency();
-            String currency = currencyProvider.getCurrency();
-            for (Product product : productService.getAllProducts(page, size, search)) {
-                ViewProductDTO viewProductDTO = new ViewProductDTO(product);
-                viewProductDTO.setPrice(productService.getNewPrice(product.getPrice(), currencyPrice));
-                viewProductDTO.setCurrency(currency);
-                viewProducts.add(viewProductDTO);
-            }
-            Page<ViewProductDTO> viewPage = new PageImpl<>(viewProducts, products.getPageable(), products.getTotalElements());
-            Map<String, Object> response = new HashMap<>();
-            response.put("products", viewPage.get().toList());
-            response.put("totalItems", viewPage.getTotalElements());
-            response.put("totalPages", viewPage.getTotalPages());
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<ProductPaginationModel> getAllProducts(@RequestParam(defaultValue = "1") int page,
+                                                                 @RequestParam(defaultValue = "5") int size,
+                                                                 @RequestParam(required = false) String search) {
+        Page<ViewProductDTO> products = productService.getAllProducts(page, size, search).map(ViewProductDTO::new);
+        List<ViewProductDTO> viewProducts = new ArrayList<>();
+        BigDecimal currencyPrice = productService.getCurrency();
+        String currency = currencyProvider.getCurrency();
+        for (Product product : productService.getAllProducts(page, size, search)) {
+            ViewProductDTO viewProductDTO = new ViewProductDTO(product);
+            viewProductDTO.setPrice(productService.getNewPrice(product.getPrice(), currencyPrice));
+            viewProductDTO.setCurrency(currency);
+            viewProducts.add(viewProductDTO);
         }
+        Page<ViewProductDTO> viewPage = new PageImpl<>(viewProducts, products.getPageable(), products.getTotalElements());
+        ProductPaginationModel response = new ProductPaginationModel(viewPage.get().toList(), viewPage.getTotalElements(), viewPage.getTotalPages());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
