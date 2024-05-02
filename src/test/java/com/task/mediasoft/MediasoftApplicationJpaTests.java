@@ -79,7 +79,7 @@ class MediasoftApplicationJpaTests {
         String article = "Article";
         String name = "5";
 
-        List<SearchCriterial<?>> filters = new ArrayList<>();
+        List<SearchCriterial> filters = new ArrayList<>();
 
         BigDecimalSearchCriterial quantityFilter = new BigDecimalSearchCriterial();
         quantityFilter.setField("quantity");

@@ -7,19 +7,16 @@ import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.repository.ProductRepository;
 import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
-import com.task.mediasoft.product.service.searchCriteria.Enums.OperationEnum;
-import jakarta.persistence.criteria.Predicate;
+import com.task.mediasoft.product.service.searchCriteria.ProductSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -57,29 +54,9 @@ public class ProductService {
      * @return страница продуктов, удовлетворяющих заданным критериям поиска
      */
     @Transactional
-    public Page<Product> searchProductsCriteriaApi(Pageable pageable, List<SearchCriterial<?>> searchCriteria) {
-        final Specification<Product> specification = (root, query, criteriaBuilder) -> {
-            final List<Predicate> predicates = new ArrayList<>();
-            searchCriteria.forEach(searchCriterial -> {
-                switch (OperationEnum.fromCode(searchCriterial.getOperation())) {
-                    case EQUAL:
-                        predicates.add(searchCriterial.equal(root.get(searchCriterial.getField()), criteriaBuilder));
-                        break;
-                    case GREATER_THAN_OR_EQ:
-                        predicates.add(searchCriterial.greaterThanOrEqualTo(root.get(searchCriterial.getField()), criteriaBuilder));
-                        break;
-                    case LESS_THAN_OR_EQ:
-                        predicates.add(searchCriterial.lessThanOrEqualTo(root.get(searchCriterial.getField()), criteriaBuilder));
-                        break;
-                    case LIKE:
-                        predicates.add(searchCriterial.like(root.get(searchCriterial.getField()), criteriaBuilder));
-                        break;
-                }
-            });
-            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-        };
-        final Page<Product> products = productRepository.findAll(specification, pageable);
-
+    public Page<Product> searchProductsCriteriaApi(Pageable pageable, List<SearchCriterial> searchCriteria) {
+        ProductSpecification productSpecification = new ProductSpecification(searchCriteria);
+        final Page<Product> products = productRepository.findAll(productSpecification, pageable);
         return products;
     }
 

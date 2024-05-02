@@ -6,6 +6,9 @@ import jakarta.persistence.criteria.Predicate;
 
 import java.math.BigDecimal;
 
+/**
+ * Стратегия предиката для типа BigDecimal.
+ */
 public class BigDecimalPredicateStrategy implements PredicateStrategy<BigDecimal> {
 
     @Override

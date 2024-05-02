@@ -6,6 +6,10 @@ import jakarta.persistence.criteria.Predicate;
 
 import java.util.UUID;
 
+
+/**
+ * Стратегия предиката для типа UUID.
+ */
 public class UUIDPredicateStrategy implements PredicateStrategy<UUID> {
     @Override
     public Predicate equal(Expression<UUID> expression, UUID value, CriteriaBuilder criteriaBuilder) {

@@ -7,6 +7,9 @@ import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Стратегия предиката для типа LocalDateTime.
+ */
 public class LocalDateTimePredicateStrategy implements PredicateStrategy<LocalDateTime> {
 
     @Override

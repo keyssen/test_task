@@ -3,9 +3,6 @@ package com.task.mediasoft.product.service.searchCriteria.Criterial;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.task.mediasoft.product.service.searchCriteria.Predicate.PredicateStrategy;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Predicate;
 
 
 /**
@@ -78,40 +75,4 @@ public interface SearchCriterial<T> {
      * @return Стратегия предиката.
      */
     PredicateStrategy<T> getPredicateStrategy();
-
-    /**
-     * Создает предикат для проверки равенства.
-     *
-     * @param expression      Выражение для сравнения.
-     * @param criteriaBuilder Строитель критериев.
-     * @return Предикат, проверяющий равенство.
-     */
-    Predicate equal(Expression<T> expression, CriteriaBuilder criteriaBuilder);
-
-    /**
-     * Создает предикат для проверки больше или равно.
-     *
-     * @param expression      Выражение для сравнения.
-     * @param criteriaBuilder Строитель критериев.
-     * @return Предикат, проверяющий больше или равно.
-     */
-    Predicate greaterThanOrEqualTo(Expression<T> expression, CriteriaBuilder criteriaBuilder);
-
-    /**
-     * Создает предикат для проверки меньше или равно.
-     *
-     * @param expression      Выражение для сравнения.
-     * @param criteriaBuilder Строитель критериев.
-     * @return Предикат, проверяющий меньше или равно.
-     */
-    Predicate lessThanOrEqualTo(Expression<T> expression, CriteriaBuilder criteriaBuilder);
-
-    /**
-     * Создает предикат для проверки сходства с использованием оператора LIKE.
-     *
-     * @param expression      Выражение для сравнения.
-     * @param criteriaBuilder Строитель критериев.
-     * @return Предикат, проверяющий сходство с использованием оператора LIKE.
-     */
-    Predicate like(Expression<T> expression, CriteriaBuilder criteriaBuilder);
 }

@@ -53,7 +53,7 @@ public class ProductController {
     }
 
     @PostMapping("/search")
-    public ResponseEntity<ProductPaginationModel> searchProducts(Pageable pageable, @Valid @RequestBody List<SearchCriterial<?>> searchCriteria) {
+    public ResponseEntity<ProductPaginationModel> searchProducts(Pageable pageable, @Valid @RequestBody List<SearchCriterial> searchCriteria) {
         Page<ViewProductDTO> products = productService.searchProductsCriteriaApi(pageable, searchCriteria).map(ViewProductDTO::new);
         ProductPaginationModel response = new ProductPaginationModel(products.get().toList(), products.getTotalElements(), products.getTotalPages());
         return new ResponseEntity<>(response, HttpStatus.OK);

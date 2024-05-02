@@ -3,9 +3,6 @@ package com.task.mediasoft.product.service.searchCriteria.Criterial;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.task.mediasoft.product.service.searchCriteria.Predicate.LocalDateTimePredicateStrategy;
 import com.task.mediasoft.product.service.searchCriteria.Predicate.PredicateStrategy;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Predicate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,20 +11,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class LocalDateTimeSearchCriterial implements SearchCriterial<LocalDateTime> {
-    /**
-     * Поле, к которому применяется критерий.
-     */
+
     private String field;
 
-    /**
-     * Значение критерия.
-     */
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd' 'HH:mm:ss")
     private LocalDateTime value;
 
-    /**
-     * Операция, которая будет применена к критерию.
-     */
     private String operation;
 
     /**
@@ -43,53 +32,5 @@ public class LocalDateTimeSearchCriterial implements SearchCriterial<LocalDateTi
     @Override
     public PredicateStrategy<LocalDateTime> getPredicateStrategy() {
         return predicateStrategy;
-    }
-
-    /**
-     * Создает предикат для проверки равенства значению LocalDateTime.
-     *
-     * @param expression      Выражение для сравнения.
-     * @param criteriaBuilder Строитель критериев.
-     * @return Предикат, проверяющий равенство.
-     */
-    @Override
-    public Predicate equal(Expression<LocalDateTime> expression, CriteriaBuilder criteriaBuilder) {
-        return getPredicateStrategy().equal(expression, value, criteriaBuilder);
-    }
-
-    /**
-     * Создает предикат для проверки больше или равно значению LocalDateTime.
-     *
-     * @param expression      Выражение для сравнения.
-     * @param criteriaBuilder Строитель критериев.
-     * @return Предикат, проверяющий больше или равно.
-     */
-    @Override
-    public Predicate greaterThanOrEqualTo(Expression<LocalDateTime> expression, CriteriaBuilder criteriaBuilder) {
-        return getPredicateStrategy().greaterThanOrEqualTo(expression, value, criteriaBuilder);
-    }
-
-    /**
-     * Создает предикат для проверки меньше или равно значению LocalDateTime.
-     *
-     * @param expression      Выражение для сравнения.
-     * @param criteriaBuilder Строитель критериев.
-     * @return Предикат, проверяющий меньше или равно.
-     */
-    @Override
-    public Predicate lessThanOrEqualTo(Expression<LocalDateTime> expression, CriteriaBuilder criteriaBuilder) {
-        return getPredicateStrategy().lessThanOrEqualTo(expression, value, criteriaBuilder);
-    }
-
-    /**
-     * Создает предикат для проверки сходства с использованием оператора LIKE для LocalDateTime.
-     *
-     * @param expression      Выражение для сравнения.
-     * @param criteriaBuilder Строитель критериев.
-     * @return Предикат, проверяющий сходство с использованием оператора LIKE.
-     */
-    @Override
-    public Predicate like(Expression<LocalDateTime> expression, CriteriaBuilder criteriaBuilder) {
-        return getPredicateStrategy().like(expression, value, criteriaBuilder);
     }
 }

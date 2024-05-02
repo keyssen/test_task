@@ -4,6 +4,9 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Predicate;
 
+/**
+ * Стратегия предиката для типа String.
+ */
 public class StringPredicateStrategy implements PredicateStrategy<String> {
     @Override
     public Predicate equal(Expression<String> expression, String value, CriteriaBuilder criteriaBuilder) {
