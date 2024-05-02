@@ -1,11 +1,13 @@
 package com.task.mediasoft.product.model;
 
+import com.task.mediasoft.orderProduct.model.OrderProduct;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -102,6 +105,18 @@ public class Product {
     private LocalDate creationDate;
 
     /**
+     * Доступность продукта.
+     */
+    @NonNull
+    @CreationTimestamp
+    @Column(name = "is_available", nullable = false)
+    private Boolean isAvailable;
+
+
+    @OneToMany(mappedBy = "product")
+    private Set<OrderProduct> orderProducts;
+
+    /**
      * Конструктор для создания нового продукта  на основе объекта {@link SaveProductDTO}.
      *
      * @param saveProductDTO Объект {@link SaveProductDTO}, на основе которого создается продукт.
@@ -113,6 +128,7 @@ public class Product {
         this.category = saveProductDTO.getCategory();
         this.price = saveProductDTO.getPrice();
         this.quantity = saveProductDTO.getQuantity();
+        this.isAvailable = saveProductDTO.getIsAvailable();
     }
 
     @Override
@@ -124,12 +140,12 @@ public class Product {
                 Objects.equals(getName(), product.getName()) && Objects.equals(getDescription(), product.getDescription()) &&
                 getCategory() == product.getCategory() && Objects.equals(getPrice(), product.getPrice()) &&
                 Objects.equals(getQuantity(), product.getQuantity()) && Objects.equals(getLastQuantityChangeDate(), product.getLastQuantityChangeDate()) &&
-                Objects.equals(getCreationDate(), product.getCreationDate());
+                Objects.equals(getCreationDate(), product.getCreationDate()) && Objects.equals(getIsAvailable(), product.getIsAvailable());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getArticle(), getName(), getDescription(), getCategory(), getPrice(), getQuantity(), getLastQuantityChangeDate(), getCreationDate());
+        return Objects.hash(getId(), getArticle(), getName(), getDescription(), getCategory(), getPrice(), getQuantity(), getLastQuantityChangeDate(), getCreationDate(), getIsAvailable());
     }
 
 }
