@@ -1,7 +1,7 @@
 package com.task.mediasoft.product.controller;
 
-import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.controller.model.ProductPaginationModel;
+import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.model.dto.ViewProductDTO;
 import com.task.mediasoft.product.service.ProductService;
@@ -9,7 +9,6 @@ import com.task.mediasoft.session.CurrencyProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,9 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -62,8 +59,7 @@ public class ProductController {
             viewProductDTO.setCurrency(currency);
             viewProducts.add(viewProductDTO);
         }
-        Page<ViewProductDTO> viewPage = new PageImpl<>(viewProducts, products.getPageable(), products.getTotalElements());
-        ProductPaginationModel response = new ProductPaginationModel(viewPage.get().toList(), viewPage.getTotalElements(), viewPage.getTotalPages());
+        ProductPaginationModel response = new ProductPaginationModel(viewProducts, products.getTotalElements(), products.getTotalPages());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
