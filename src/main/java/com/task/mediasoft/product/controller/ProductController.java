@@ -34,7 +34,6 @@ public class ProductController {
 
     private final ProductService productService;
 
-
     /**
      * Получает список всех продуктов с пагинацией и поиском.
      *
@@ -58,7 +57,6 @@ public class ProductController {
         ProductPaginationModel response = new ProductPaginationModel(products.get().toList(), products.getTotalElements(), products.getTotalPages());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
 
     /**
      * Получает продукт по его артикулу.

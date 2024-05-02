@@ -68,7 +68,7 @@ public class ProductService {
      * @return Найденный продукт.
      * @throws ProductNotFoundExceptionById если продукт не найден.
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public Product getProductById(UUID id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundExceptionById(id));
