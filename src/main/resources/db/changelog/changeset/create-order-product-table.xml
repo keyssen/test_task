@@ -12,7 +12,7 @@
             <column name="product_id" type="uuid">
                 <constraints nullable="false"/>
             </column>
-            <column name="price" type="numeric(10, 2)">
+            <column name="frozen_price" type="numeric(10, 2)">
                 <constraints nullable="false"/>
             </column>
             <column name="quantity" type="bigint">
@@ -22,22 +22,22 @@
 
         <addForeignKeyConstraint baseTableName="order_product"
                                  baseColumnNames="order_id"
-                                 referencedTableName="order"
+                                 referencedTableName="orders"
                                  referencedColumnNames="id"
-                                 constraintName="FK_orderProduct_order"/>
+                                 constraintName="FK_orderProduct_order"
+                                 onDelete="RESTRICT"/>
 
         <addForeignKeyConstraint baseTableName="order_product"
                                  baseColumnNames="product_id"
                                  referencedTableName="product"
                                  referencedColumnNames="id"
-                                 constraintName="FK_orderProduct_product"/>
-        
+                                 constraintName="FK_orderProduct_product"
+                                 onDelete="RESTRICT"/>
+
         <addPrimaryKey
                 columnNames="order_id, product_id"
                 constraintName="PK_orderProduct"
-                schemaName="public"
-                tableName="order_product"
-                tablespace="A String"/>
+                tableName="order_product"/>
 
     </changeSet>
 </databaseChangeLog>

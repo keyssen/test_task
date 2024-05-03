@@ -1,6 +1,6 @@
 package com.task.mediasoft.order.model;
 
-public enum StatusEnum {
+public enum OrderStatus {
     CREATED,
     CONFIRMED,
     CANCELLED,

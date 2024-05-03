@@ -22,8 +22,8 @@ import org.hibernate.annotations.UuidGenerator;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -42,7 +42,7 @@ public class Product {
      */
     @Id
     @UuidGenerator
-    @Column(name = "id", nullable = false, updatable = false)
+    @Column(name = "id", nullable = false, updatable = false, columnDefinition = "UUID")
     private UUID id;
 
     /**
@@ -108,13 +108,12 @@ public class Product {
      * Доступность продукта.
      */
     @NonNull
-    @CreationTimestamp
     @Column(name = "is_available", nullable = false)
     private Boolean isAvailable;
 
 
     @OneToMany(mappedBy = "product")
-    private Set<OrderProduct> orderProducts;
+    private List<OrderProduct> orderProducts;
 
     /**
      * Конструктор для создания нового продукта  на основе объекта {@link SaveProductDTO}.

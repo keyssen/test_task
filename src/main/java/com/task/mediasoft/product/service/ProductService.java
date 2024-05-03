@@ -106,6 +106,7 @@ public class ProductService {
         currentProduct.setCategory(updateProducttDTO.getCategory());
         currentProduct.setPrice(updateProducttDTO.getPrice());
         currentProduct.setQuantity(updateProducttDTO.getQuantity());
+        currentProduct.setIsAvailable(updateProducttDTO.getIsAvailable());
 
         return productRepository.save(currentProduct);
     }

@@ -1,17 +1,18 @@
 package com.task.mediasoft.order.model.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class SaveOrderDTO {
-
-    @NotNull(message = "Customer ID is required")
-    private final Long customerId;
-
-    @NotBlank(message = "Article is required")
+    @NotBlank(message = "Delivery address is required")
     @Size(min = 3, max = 255)
     private final String deliveryAddress;
+
+    @NotEmpty(message = "Products is required")
+    private final List<SaveOrderProductDTO> products;
 }

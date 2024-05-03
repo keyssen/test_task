@@ -1,7 +1,7 @@
 package com.task.mediasoft.order.model.dto;
 
 import com.task.mediasoft.order.model.Order;
-import com.task.mediasoft.order.model.StatusEnum;
+import com.task.mediasoft.order.model.OrderStatus;
 import lombok.Data;
 
 import java.util.UUID;
@@ -13,9 +13,11 @@ public class ViewOrderDTO {
 
     private final Long customerId;
 
-    private final StatusEnum status;
+    private final OrderStatus status;
 
     private final String deliveryAddress;
+
+    private final List<S> deliveryAddress;
 
     public ViewOrderDTO(Order order) {
         this.id = order.getId();

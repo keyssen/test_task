@@ -28,7 +28,7 @@ public class OrderProduct {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "orders_id")
+    @JoinColumn(name = "order_id")
     Order order;
 
     @Id
@@ -36,8 +36,8 @@ public class OrderProduct {
     @JoinColumn(name = "product_id")
     Product product;
 
-    @Column(name = "price", nullable = false)
-    private BigDecimal price;
+    @Column(name = "frozen_price", nullable = false)
+    private BigDecimal frozenPrice;
 
     @Column(name = "quantity", nullable = false)
     private Long quantity;
@@ -46,11 +46,11 @@ public class OrderProduct {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof OrderProduct that)) return false;
-        return Objects.equals(getOrder(), that.getOrder()) && Objects.equals(getProduct(), that.getProduct()) && Objects.equals(getPrice(), that.getPrice()) && Objects.equals(getQuantity(), that.getQuantity());
+        return Objects.equals(getOrder(), that.getOrder()) && Objects.equals(getProduct(), that.getProduct()) && Objects.equals(getFrozenPrice(), that.getFrozenPrice()) && Objects.equals(getQuantity(), that.getQuantity());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getOrder(), getProduct(), getPrice(), getQuantity());
+        return Objects.hash(getOrder(), getProduct(), getFrozenPrice(), getQuantity());
     }
 }

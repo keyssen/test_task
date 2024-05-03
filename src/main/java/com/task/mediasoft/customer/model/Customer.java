@@ -1,5 +1,6 @@
 package com.task.mediasoft.customer.model;
 
+import com.task.mediasoft.customer.model.dto.SaveCustomerDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -35,4 +36,10 @@ public class Customer {
     @NonNull
     @Column(name = "isActive", nullable = false)
     private Boolean isActive;
+
+    public Customer(SaveCustomerDTO saveCustomerDTO) {
+        this.login = saveCustomerDTO.getLogin();
+        this.email = saveCustomerDTO.getEmail();
+        this.isActive = saveCustomerDTO.getIsActive();
+    }
 }

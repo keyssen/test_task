@@ -4,6 +4,8 @@ import com.task.mediasoft.order.model.dto.SaveOrderDTO;
 import com.task.mediasoft.orderProduct.model.OrderProduct;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -13,8 +15,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -25,7 +27,7 @@ import java.util.UUID;
 public class Order {
     @Id
     @UuidGenerator
-    @Column(name = "id", nullable = false, updatable = false)
+    @Column(name = "id", nullable = false, updatable = false, columnDefinition = "UUID")
     private UUID id;
 
     @NonNull
@@ -34,17 +36,17 @@ public class Order {
 
     @NonNull
     @Column(name = "status", nullable = false)
-    private StatusEnum status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     @NonNull
     @Column(name = "delivery_address", nullable = false)
     private String deliveryAddress;
 
     @OneToMany(mappedBy = "order")
-    private Set<OrderProduct> orderProducts;
+    private List<OrderProduct> orderProducts;
 
     public Order(SaveOrderDTO saveOrderDTO) {
-        this.customerId = saveOrderDTO.getCustomerId();
         this.deliveryAddress = saveOrderDTO.getDeliveryAddress();
     }
 
