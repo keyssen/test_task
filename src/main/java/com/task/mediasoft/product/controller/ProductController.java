@@ -4,9 +4,11 @@ import com.task.mediasoft.product.controller.model.ProductPaginationModel;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.model.dto.ViewProductDTO;
 import com.task.mediasoft.product.service.ProductService;
+import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -44,6 +47,13 @@ public class ProductController {
                                                                  @RequestParam(defaultValue = "5") int size,
                                                                  @RequestParam(required = false) String search) {
         Page<ViewProductDTO> products = productService.getAllProducts(page, size, search).map(ViewProductDTO::new);
+        ProductPaginationModel response = new ProductPaginationModel(products.get().toList(), products.getTotalElements(), products.getTotalPages());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<ProductPaginationModel> searchProducts(Pageable pageable, @Valid @RequestBody List<SearchCriterial> searchCriteria) {
+        Page<ViewProductDTO> products = productService.searchProductsCriteriaApi(pageable, searchCriteria).map(ViewProductDTO::new);
         ProductPaginationModel response = new ProductPaginationModel(products.get().toList(), products.getTotalElements(), products.getTotalPages());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
