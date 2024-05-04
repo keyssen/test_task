@@ -2,19 +2,18 @@ package com.task.mediasoft.order.exception;
 
 import com.task.mediasoft.order.model.OrderStatus;
 
-import java.util.UUID;
-
-public class OrderFailedCreateException extends RuntimeException {
+public class OrderStatusException extends RuntimeException {
     /**
      * Конструктор для создания исключения OrderNotFoundExceptionById с сообщением об ошибке.
      *
      * @param id Идентификтаор продукта, который не был найден.
      */
-    public OrderFailedCreateException(UUID productId, Boolean isAvailable, Long productQuantity, Long actualQuantity) {
-        super(String.format("Product with id = '%s', isAvailable = '%s', quantity = '%s', actualQuantity = '%s' has caused an error", productId, isAvailable, productQuantity, actualQuantity));
+
+    public OrderStatusException(OrderStatus orderStatus) {
+        super(String.format("An error occurred while creating an order because the order status is not equal to '%s'", orderStatus));
     }
 
-    public OrderFailedCreateException(OrderStatus orderStatus) {
-        super(String.format("An error occurred while creating an order because the order status is not equal to '%s'", orderStatus));
+    public OrderStatusException() {
+        super(String.format("Error in order status"));
     }
 }

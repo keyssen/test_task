@@ -1,6 +1,8 @@
 package com.task.mediasoft.util.error;
 
 
+import com.task.mediasoft.order.exception.OrderFailedCreateException;
+import com.task.mediasoft.order.exception.OrderForbiddenCustomerException;
 import com.task.mediasoft.product.exception.ErrorDetails;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionByArticle;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionById;
@@ -33,9 +35,23 @@ public class AdviceController {
     @ExceptionHandler({ProductNotFoundExceptionById.class, ProductNotFoundExceptionByArticle.class})
     public ResponseEntity<Object> handleProductNotFoundExceptionById(RuntimeException e) {
         final ErrorDetails errorDetails = new ErrorDetails(e.getStackTrace()[0].getClassName(), e.getClass().getSimpleName(), e.getMessage(), LocalDateTime.now());
+        e.printStackTrace();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDetails);
     }
 
+    @ExceptionHandler({OrderFailedCreateException.class})
+    public ResponseEntity<Object> handleOrderSaveException(RuntimeException e) {
+        final ErrorDetails errorDetails = new ErrorDetails(e.getStackTrace()[0].getClassName(), e.getClass().getSimpleName(), e.getMessage(), LocalDateTime.now());
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
+    }
+
+    @ExceptionHandler({OrderForbiddenCustomerException.class})
+    public ResponseEntity<Object> handleOrderForbiddenException(RuntimeException e) {
+        final ErrorDetails errorDetails = new ErrorDetails(e.getStackTrace()[0].getClassName(), e.getClass().getSimpleName(), e.getMessage(), LocalDateTime.now());
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorDetails);
+    }
 
     /**
      * Обработчик исключения MethodArgumentNotValidException при автоматической валидации данных.
@@ -51,7 +67,7 @@ public class AdviceController {
         final String errorMessages = fieldErrors.stream().map(fieldError -> fieldError.getField() + " " + fieldError.getDefaultMessage()).collect(Collectors.joining("; "));
 
         final ErrorDetails errorDetails = new ErrorDetails(e.getObjectName(), e.getClass().getSimpleName(), errorMessages, LocalDateTime.now());
-
+        e.printStackTrace();
         return ResponseEntity.badRequest().body(errorDetails);
     }
 
