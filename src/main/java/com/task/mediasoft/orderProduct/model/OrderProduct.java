@@ -17,6 +17,9 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+/**
+ * Модель для отображения связи между заказом и продуктом.
+ */
 @Entity
 @Getter
 @Setter
@@ -26,19 +29,31 @@ import java.util.Objects;
 @IdClass(OrderProductId.class)
 public class OrderProduct {
 
+    /**
+     * Ссылка на заказ.
+     */
     @Id
     @ManyToOne
     @JoinColumn(name = "order_id")
-    Order order;
+    private Order order;
 
+    /**
+     * Ссылка на продукт.
+     */
     @Id
     @ManyToOne
     @JoinColumn(name = "product_id")
-    Product product;
+    private Product product;
 
+    /**
+     * Замороженная цена продукта на момент добавления в заказ.
+     */
     @Column(name = "frozen_price", nullable = false)
     private BigDecimal frozenPrice;
 
+    /**
+     * Количество продуктов.
+     */
     @Column(name = "quantity", nullable = false)
     private Long quantity;
 

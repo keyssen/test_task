@@ -11,14 +11,23 @@ import java.io.Serializable;
 import java.util.Objects;
 
 
+/**
+ * Идентификатор для связи между заказом и продуктом.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Embeddable
 public class OrderProductId implements Serializable {
 
+    /**
+     * Ссылка на заказ.
+     */
     private Order order;
 
+    /**
+     * Ссылка на продукт.
+     */
     private Product product;
 
     @Override

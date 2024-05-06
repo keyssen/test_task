@@ -1,27 +1,46 @@
 package com.task.mediasoft.order.model.dto;
 
 import com.task.mediasoft.order.model.Order;
-import com.task.mediasoft.orderProduct.model.OrderProduct;
+import com.task.mediasoft.order.model.OrderStatus;
 import lombok.Data;
 
-import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
+/**
+ * Data Transfer Object (DTO) для представления информации о заказе.
+ */
 @Data
 public class ViewOrderDTO {
 
-    private final UUID orderId;
+    /**
+     * Идентификатор заказа.
+     */
+    private final UUID id;
 
-    private final List<ViewProductFromOrderDTO> products;
+    /**
+     * Идентификатор клиента, сделавшего заказ.
+     */
+    private final Long customerId;
 
-    private final BigDecimal totalPrice;
+    /**
+     * Статус заказа.
+     */
+    private final OrderStatus status;
 
+    /**
+     * Адрес доставки заказа.
+     */
+    private final String deliveryAddress;
+
+    /**
+     * Создает новый объект ViewOrderDTO на основе сущности Order.
+     *
+     * @param order Сущность Order, из которой извлекаются данные для представления.
+     */
     public ViewOrderDTO(Order order) {
-        this.orderId = order.getId();
-        this.products = order.getOrderProducts().stream().map(ViewProductFromOrderDTO::new).toList();
-        this.totalPrice = order.getOrderProducts().stream()
-                .map(OrderProduct::getFrozenPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        this.id = order.getId();
+        this.customerId = order.getCustomer().getId();
+        this.status = order.getStatus();
+        this.deliveryAddress = order.getDeliveryAddress();
     }
 }

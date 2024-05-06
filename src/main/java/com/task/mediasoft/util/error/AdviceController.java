@@ -3,6 +3,8 @@ package com.task.mediasoft.util.error;
 
 import com.task.mediasoft.order.exception.OrderFailedCreateException;
 import com.task.mediasoft.order.exception.OrderForbiddenCustomerException;
+import com.task.mediasoft.order.exception.OrderNotFoundExceptionById;
+import com.task.mediasoft.order.exception.OrderStatusException;
 import com.task.mediasoft.product.exception.ErrorDetails;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionByArticle;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionById;
@@ -26,26 +28,38 @@ import java.util.stream.Collectors;
 public class AdviceController {
 
     /**
-     * Обработчик исключений ProductNotFoundExceptionById и ProductNotFoundExceptionByArticle.
+     * Обработчик исключений ProductNotFoundExceptionById, ProductNotFoundExceptionByArticle и OrderNotFoundExceptionById.
      * Возвращает ответ с сообщением об ошибке и статусом NOT_FOUND.
      *
      * @param e Исключение, которое необходимо обработать.
      * @return ResponseEntity с сообщением об ошибке и статусом NOT_FOUND.
      */
-    @ExceptionHandler({ProductNotFoundExceptionById.class, ProductNotFoundExceptionByArticle.class})
+    @ExceptionHandler({ProductNotFoundExceptionById.class, ProductNotFoundExceptionByArticle.class, OrderNotFoundExceptionById.class})
     public ResponseEntity<Object> handleProductNotFoundExceptionById(RuntimeException e) {
         final ErrorDetails errorDetails = new ErrorDetails(e.getStackTrace()[0].getClassName(), e.getClass().getSimpleName(), e.getMessage(), LocalDateTime.now());
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorDetails);
     }
 
-    @ExceptionHandler({OrderFailedCreateException.class})
+    /**
+     * Обрабатывает исключения, связанные с ошибкой создания заказа и ошибкой статуса заказа.
+     *
+     * @param e Исключение, связанное с ошибкой создания заказа или ошибкой статуса заказа.
+     * @return Ответ с деталями об ошибке и статусом HTTP 400 Bad Request.
+     */
+    @ExceptionHandler({OrderFailedCreateException.class, OrderStatusException.class})
     public ResponseEntity<Object> handleOrderSaveException(RuntimeException e) {
         final ErrorDetails errorDetails = new ErrorDetails(e.getStackTrace()[0].getClassName(), e.getClass().getSimpleName(), e.getMessage(), LocalDateTime.now());
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDetails);
     }
 
+    /**
+     * Обрабатывает исключения, связанные с запретом доступа к заказу.
+     *
+     * @param e Исключение, связанное с запретом доступа к заказу.
+     * @return Ответ с деталями об ошибке и статусом HTTP 403 Forbidden.
+     */
     @ExceptionHandler({OrderForbiddenCustomerException.class})
     public ResponseEntity<Object> handleOrderForbiddenException(RuntimeException e) {
         final ErrorDetails errorDetails = new ErrorDetails(e.getStackTrace()[0].getClassName(), e.getClass().getSimpleName(), e.getMessage(), LocalDateTime.now());

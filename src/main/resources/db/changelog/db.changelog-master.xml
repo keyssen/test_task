@@ -13,6 +13,6 @@
 
     <include file="/db/changelog/changeset/create-order-product-table.xml"/>
 
-    <include file="/db/changelog/changeset/insert-products.xml"/>
-    
+    <!--    <include file="/db/changelog/changeset/insert-products.xml"/>-->
+
 </databaseChangeLog>

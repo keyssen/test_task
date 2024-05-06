@@ -1,19 +1,17 @@
 package com.task.mediasoft.order.exception;
 
 
-import com.task.mediasoft.order.model.Order;
-
 import java.util.UUID;
 
 /**
- * Исключение, выбрасываемое при отсутствии продукта по его артикулу.
- * {@link Order} с указанным идентификатором не был найден.
+ * Исключение, выбрасываемое при попытке найти заказ по идентификатору, который не существует.
  */
 public class OrderNotFoundExceptionById extends RuntimeException {
+
     /**
-     * Конструктор для создания исключения OrderNotFoundExceptionById с сообщением об ошибке.
+     * Создает новый экземпляр исключения с указанным идентификатором заказа.
      *
-     * @param id Идентификтаор продукта, который не был найден.
+     * @param id Идентификатор заказа, который не найден.
      */
     public OrderNotFoundExceptionById(UUID id) {
         super(String.format("Order with id = '%s' not found", id));

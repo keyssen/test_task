@@ -64,6 +64,11 @@ public class ViewProductDTO {
     private final LocalDate creationDate;
 
     /**
+     * Доступность продукта.
+     */
+    private final Boolean isAvailable;
+
+    /**
      * Конструктор для создания объекта ViewProductDTO.
      *
      * @param product Объект Product, на основе которого создается ViewProductDTO.
@@ -78,5 +83,6 @@ public class ViewProductDTO {
         this.quantity = product.getQuantity();
         this.lastQuantityChangeDate = product.getLastQuantityChangeDate();
         this.creationDate = product.getCreationDate();
+        this.isAvailable = product.getIsAvailable();
     }
 }
