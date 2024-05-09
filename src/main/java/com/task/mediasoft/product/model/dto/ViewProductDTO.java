@@ -3,6 +3,7 @@ package com.task.mediasoft.product.model.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.task.mediasoft.product.model.CategoryType;
 import com.task.mediasoft.product.model.Product;
+import com.task.mediasoft.session.CurrencyEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -68,7 +69,7 @@ public class ViewProductDTO {
     /**
      * Валюта продукта.
      */
-    private String currency;
+    private CurrencyEnum currency;
 
     /**
      * Конструктор для создания объекта ViewProductDTO.
@@ -85,6 +86,6 @@ public class ViewProductDTO {
         this.quantity = product.getQuantity();
         this.lastQuantityChangeDate = product.getLastQuantityChangeDate();
         this.creationDate = product.getCreationDate();
-        this.currency = "RUB";
+        this.currency = CurrencyEnum.RUB;
     }
 }

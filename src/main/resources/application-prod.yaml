@@ -27,8 +27,10 @@ app:
     priceIncreasePercentage: 10.1
     optimization: true
 
-currency-service:
-  client: implementation
-  host: http://localhost:8081 #хост второго сервиса
-  methods:
-    get-currency: /currencies #урл эндпоинта с курсами для GET запроса
+rest:
+  currency-service:
+    mock:
+      enabled: false
+    host: http://localhost:8081 #хост второго сервиса
+    methods:
+      get-currency: /currencies #урл эндпоинта с курсами для GET запроса

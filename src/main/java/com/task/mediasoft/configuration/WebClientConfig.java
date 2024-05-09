@@ -1,13 +1,11 @@
 package com.task.mediasoft.configuration;
 
 
+import com.task.mediasoft.configuration.properties.ConfigProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import java.util.Objects;
 
 /**
  * Конфигурационный класс для настройки {@link WebClient}.
@@ -20,7 +18,7 @@ import java.util.Objects;
 @Configuration
 @RequiredArgsConstructor
 public class WebClientConfig {
-    private final Environment env;
+    private final ConfigProperties configProperties;
 
     /**
      * Создает и возвращает настроенный экземпляр {@link WebClient}.
@@ -36,6 +34,6 @@ public class WebClientConfig {
      */
     @Bean
     public WebClient webClient(WebClient.Builder webClientBuilder) {
-        return webClientBuilder.baseUrl(Objects.requireNonNull(env.getProperty("currency-service.host"))).build();
+        return webClientBuilder.baseUrl(configProperties.getHost()).build();
     }
 }

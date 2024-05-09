@@ -1,14 +1,11 @@
 package com.task.mediasoft.product.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionByArticle;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionById;
 import com.task.mediasoft.product.exception.ProductWithArticleAlreadyExistsException;
 import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.repository.ProductRepository;
-import com.task.mediasoft.product.service.currencyService.CurrencyServiceClient;
 import com.task.mediasoft.session.CurrencyProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,13 +14,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -35,8 +29,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
-    private final CurrencyServiceClient currencyServiceClient;
     private final CurrencyProvider currencyProvider;
+    private final ExchangeRateProvider exchangeRateProvider;
 
     /**
      * Получение продуктов с возможностью поиска по строке.
@@ -66,7 +60,7 @@ public class ProductService {
     public Product getProductById(UUID id) {
         final Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundExceptionById(id));
-        product.setPrice(getNewPrice(product.getPrice(), getCurrency()));
+        product.setPrice(getNewPrice(product.getPrice(), exchangeRateProvider.getExchangeRate(currencyProvider.getCurrency())));
         return product;
     }
 
@@ -81,7 +75,7 @@ public class ProductService {
     public Product getProductByArticle(String article) {
         final Product product = productRepository.findByArticleEquals(article)
                 .orElseThrow(() -> new ProductNotFoundExceptionByArticle(article));
-        product.setPrice(getNewPrice(product.getPrice(), getCurrency()));
+        product.setPrice(getNewPrice(product.getPrice(), exchangeRateProvider.getExchangeRate(currencyProvider.getCurrency())));
         return product;
     }
 
@@ -147,46 +141,6 @@ public class ProductService {
     @Transactional
     public void deleteAllProduct() {
         productRepository.deleteAll();
-    }
-
-    /**
-     * Получает текущий обменный курс валюты от удаленного сервиса, с запасным вариантом
-     * использования локального файла при сбое удаленного вызова.
-     * <p>
-     * Этот метод сначала пытается получить обменный курс валюты от удаленного сервиса.
-     * Если вызов проходит успешно, метод извлекает курс обмена для указанной валюты из ответа.
-     * Если при вызове происходит сетевая или серверная ошибка, метод пытается
-     * прочитать курс обмена из локального файла с именем "exchange-rate.json".
-     * </p>
-     * <p>
-     * Если курс обмена успешно получен либо от удаленного сервиса, либо из локального файла,
-     * он возвращается. В противном случае возвращается стандартный курс обмена равный 1.
-     * </p>
-     *
-     * @return Текущий курс обмена валюты в виде {@link BigDecimal}. Этот курс может быть получен
-     * либо от удаленного сервиса, либо из локального файла, либо по умолчанию равен 1,
-     * если оба метода извлечения данных не удаются.
-     * @throws WebClientResponseException если возникает проблема с вызовом удаленного сервиса
-     */
-    public BigDecimal getCurrency() {
-        BigDecimal currencyValue = new BigDecimal(1);
-        String currency = currencyProvider.getCurrency();
-        try {
-            Map<String, BigDecimal> map = currencyServiceClient.someRestCall();
-            BigDecimal currencyServices = map.get(currency);
-            if (currencyServices != null) {
-                currencyValue = currencyServices;
-            }
-        } catch (WebClientResponseException e) {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode currencyJsonNode = objectMapper.readTree(new File("exchange-rate.json")).get(currency);
-            log.info("FILE");
-            if (currencyJsonNode != null) {
-                currencyValue = new BigDecimal(currencyJsonNode.asText());
-            }
-        } finally {
-            return currencyValue;
-        }
     }
 
     /**

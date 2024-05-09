@@ -4,7 +4,9 @@ import com.task.mediasoft.product.controller.model.ProductPaginationModel;
 import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.model.dto.ViewProductDTO;
+import com.task.mediasoft.product.service.ExchangeRateProvider;
 import com.task.mediasoft.product.service.ProductService;
+import com.task.mediasoft.session.CurrencyEnum;
 import com.task.mediasoft.session.CurrencyProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,7 @@ import java.util.UUID;
 public class ProductController {
 
     private final ProductService productService;
+    private final ExchangeRateProvider exchangeRateProvider;
     private final CurrencyProvider currencyProvider;
 
     /**
@@ -51,8 +54,8 @@ public class ProductController {
                                                                  @RequestParam(required = false) String search) {
         Page<ViewProductDTO> products = productService.getAllProducts(page, size, search).map(ViewProductDTO::new);
         List<ViewProductDTO> viewProducts = new ArrayList<>();
-        BigDecimal currencyPrice = productService.getCurrency();
-        String currency = currencyProvider.getCurrency();
+        CurrencyEnum currency = currencyProvider.getCurrency();
+        BigDecimal currencyPrice = exchangeRateProvider.getExchangeRate(currency);
         for (Product product : productService.getAllProducts(page, size, search)) {
             ViewProductDTO viewProductDTO = new ViewProductDTO(product);
             viewProductDTO.setPrice(productService.getNewPrice(product.getPrice(), currencyPrice));
