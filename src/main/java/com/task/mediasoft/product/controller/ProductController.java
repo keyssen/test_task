@@ -51,6 +51,13 @@ public class ProductController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    /**
+     * Обрабатывает POST-запрос на поиск продуктов с учетом заданных критериев.
+     *
+     * @param pageable       Объект, представляющий параметры страницы и сортировку для запроса.
+     * @param searchCriteria Список критериев поиска продуктов.
+     * @return Ответ с пагинированным списком найденных продуктов и информацией о пагинации.
+     */
     @PostMapping("/search")
     public ResponseEntity<ProductPaginationModel> searchProducts(Pageable pageable, @Valid @RequestBody List<SearchCriterial> searchCriteria) {
         Page<ViewProductDTO> products = productService.searchProductsCriteriaApi(pageable, searchCriteria).map(ViewProductDTO::new);
