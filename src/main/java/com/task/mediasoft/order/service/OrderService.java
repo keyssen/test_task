@@ -11,6 +11,7 @@ import com.task.mediasoft.order.model.OrderStatus;
 import com.task.mediasoft.order.model.dto.ChangeStatusDTO;
 import com.task.mediasoft.order.model.dto.SaveOrderDTO;
 import com.task.mediasoft.order.model.dto.SaveOrderProductDTO;
+import com.task.mediasoft.order.model.dto.ViewProductFromOrderDTO;
 import com.task.mediasoft.order.repository.OrderRepository;
 import com.task.mediasoft.orderProduct.model.OrderProduct;
 import com.task.mediasoft.orderProduct.repository.OrderProductRepository;
@@ -52,6 +53,19 @@ public class OrderService {
         if (!currentOrder.getCustomer().getId().equals(customerIdProvider.getCustomerId()))
             throw new OrderForbiddenCustomerException(customerIdProvider.getCustomerId());
         return currentOrder;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ViewProductFromOrderDTO> getAllViewProductsByOrderId(UUID id) {
+        final Order currentOrder = orderRepository.findById(id)
+                .orElseThrow(() -> new OrderNotFoundExceptionById(id));
+        if (!currentOrder.getCustomer().getId().equals(customerIdProvider.getCustomerId()))
+            throw new OrderForbiddenCustomerException(customerIdProvider.getCustomerId());
+
+        final List<ViewProductFromOrderDTO> listViewProductFromOrderDTO = orderProductRepository.findAllViewProductsByOrderId(id);
+        if (!currentOrder.getCustomer().getId().equals(customerIdProvider.getCustomerId()))
+            throw new OrderForbiddenCustomerException(customerIdProvider.getCustomerId());
+        return listViewProductFromOrderDTO;
     }
 
     /**

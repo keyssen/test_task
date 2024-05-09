@@ -37,7 +37,7 @@ public class OrderController {
      */
     @GetMapping("/{id}")
     public ViewOrderWithProductDTO getOrderById(@PathVariable UUID id) {
-        return new ViewOrderWithProductDTO(orderService.getOrderById(id));
+        return new ViewOrderWithProductDTO(id, orderService.getAllViewProductsByOrderId(id));
     }
 
 

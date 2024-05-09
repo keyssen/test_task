@@ -43,4 +43,11 @@ public class ViewProductFromOrderDTO {
         this.quantity = orderProduct.getQuantity();
         this.price = orderProduct.getFrozenPrice();
     }
+
+    public ViewProductFromOrderDTO(UUID productId, String name, Long quantity, BigDecimal price) {
+        this.productId = productId;
+        this.name = name;
+        this.quantity = quantity;
+        this.price = price;
+    }
 }

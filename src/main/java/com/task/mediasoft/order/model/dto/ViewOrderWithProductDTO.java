@@ -40,4 +40,18 @@ public class ViewOrderWithProductDTO {
                 .map(orderProduct -> orderProduct.getFrozenPrice().multiply(BigDecimal.valueOf(orderProduct.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
+    /**
+     * Создает новый объект ViewOrderWithProductDTO на основе указанного идентификатора заказа и списка продуктов.
+     *
+     * @param orderId  Идентификатор заказа.
+     * @param products Список продуктов в заказе.
+     */
+    public ViewOrderWithProductDTO(UUID orderId, List<ViewProductFromOrderDTO> products) {
+        this.orderId = orderId;
+        this.products = products;
+        this.totalPrice = products.stream()
+                .map(product -> product.getPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 }
