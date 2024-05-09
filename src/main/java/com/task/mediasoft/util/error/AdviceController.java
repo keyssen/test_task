@@ -67,6 +67,7 @@ public class AdviceController {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleUnknownException(Throwable e) {
         final ErrorDetails errorDetails = new ErrorDetails(e.getStackTrace()[0].getClassName(), e.getClass().getSimpleName(), e.getMessage(), LocalDateTime.now());
+        e.printStackTrace();
         return ResponseEntity.internalServerError().body(errorDetails);
     }
 }

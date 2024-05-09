@@ -7,10 +7,13 @@ import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.repository.ProductRepository;
 import com.task.mediasoft.session.CurrencyProvider;
+import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
+import com.task.mediasoft.product.service.searchCriteria.ProductSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -40,7 +44,6 @@ public class ProductService {
      * @param search Строка поиска по имени продукта.
      * @return Страница продуктов.
      */
-
     @Transactional(readOnly = true)
     public Page<Product> getAllProducts(int page, int size, String search) {
         if (search != null && !search.isEmpty()) {
@@ -48,6 +51,22 @@ public class ProductService {
         }
         return productRepository.findAll(PageRequest.of(page - 1, size, Sort.by("id")));
     }
+
+    /**
+     * Поиск продуктов с использованием Criteria API и применением критериев поиска.
+     * Метод осуществляет поиск продуктов в базе данных с использованием JPA Criteria API.
+     *
+     * @param pageable       объект, предоставляющий информацию о странице и сортировке результатов
+     * @param searchCriteria список критериев поиска, которые будут применены к запросу
+     * @return страница продуктов, удовлетворяющих заданным критериям поиска
+     */
+    @Transactional
+    public Page<Product> searchProductsCriteriaApi(Pageable pageable, List<SearchCriterial> searchCriteria) {
+        ProductSpecification productSpecification = new ProductSpecification(searchCriteria);
+        final Page<Product> products = productRepository.findAll(productSpecification, pageable);
+        return products;
+    }
+
 
     /**
      * Получение продукта по идентификатору и изменение его цены в соотвествии с валютой.
