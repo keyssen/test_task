@@ -64,7 +64,6 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional(readOnly = true)
     public ViewOrderWithProductDTO getViewOrderWithProductDTO(UUID id) {
-        getOrderById(id);
         if (!orderRepository.existsByIdAndCustomer_Id(id, customerIdProvider.getCustomerId()))
             throw new OrderForbiddenCustomerException(customerIdProvider.getCustomerId());
         final List<ViewProductFromOrderDTO> products = orderProductRepository.findAllViewProductsByOrderId(id);
