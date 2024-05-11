@@ -2,7 +2,6 @@ package com.task.mediasoft.order.model;
 
 import com.task.mediasoft.customer.model.Customer;
 import com.task.mediasoft.orderProduct.model.OrderProduct;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -70,7 +69,7 @@ public class Order {
     /**
      * Продукты, входящие в заказ.
      */
-    @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "order")
+    @OneToMany(mappedBy = "order")
     @Fetch(FetchMode.JOIN)
     private List<OrderProduct> orderProducts = new ArrayList<>();
 
