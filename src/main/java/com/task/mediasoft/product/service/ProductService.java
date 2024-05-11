@@ -6,13 +6,20 @@ import com.task.mediasoft.product.exception.ProductWithArticleAlreadyExistsExcep
 import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.repository.ProductRepository;
+import com.task.mediasoft.session.CurrencyProvider;
+import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
+import com.task.mediasoft.product.service.searchCriteria.ProductSpecification;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -22,10 +29,13 @@ import java.util.UUID;
 /**
  * Класс реализующий бизнес логику для работы с продуктами
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final CurrencyProvider currencyProvider;
+    private final ExchangeRateProvider exchangeRateProvider;
 
     /**
      * Получение продуктов с возможностью поиска по строке.
@@ -44,7 +54,23 @@ public class ProductService {
     }
 
     /**
-     * Получение продукта по идентификатору.
+     * Поиск продуктов с использованием Criteria API и применением критериев поиска.
+     * Метод осуществляет поиск продуктов в базе данных с использованием JPA Criteria API.
+     *
+     * @param pageable       объект, предоставляющий информацию о странице и сортировке результатов
+     * @param searchCriteria список критериев поиска, которые будут применены к запросу
+     * @return страница продуктов, удовлетворяющих заданным критериям поиска
+     */
+    @Transactional
+    public Page<Product> searchProductsCriteriaApi(Pageable pageable, List<SearchCriterial> searchCriteria) {
+        ProductSpecification productSpecification = new ProductSpecification(searchCriteria);
+        final Page<Product> products = productRepository.findAll(productSpecification, pageable);
+        return products;
+    }
+
+
+    /**
+     * Получение продукта по идентификатору и изменение его цены в соотвествии с валютой.
      *
      * @param id Идентификатор продукта.
      * @return Найденный продукт.
@@ -52,8 +78,10 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public Product getProductById(UUID id) {
-        return productRepository.findById(id)
+        final Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundExceptionById(id));
+        product.setPrice(getNewPrice(product.getPrice(), exchangeRateProvider.getExchangeRate(currencyProvider.getCurrency())));
+        return product;
     }
 
     @Transactional(readOnly = true)
@@ -62,7 +90,7 @@ public class ProductService {
     }
 
     /**
-     * Получение продукта по артикулу.
+     * Получение продукта по артикулу и изменение его цены в соотвествии с валютой.
      *
      * @param article Артикул продукта.
      * @return Найденный продукт.
@@ -70,7 +98,10 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public Product getProductByArticle(String article) {
-        return productRepository.findByArticleEquals(article).orElseThrow(() -> new ProductNotFoundExceptionByArticle(article));
+        final Product product = productRepository.findByArticleEquals(article)
+                .orElseThrow(() -> new ProductNotFoundExceptionByArticle(article));
+        product.setPrice(getNewPrice(product.getPrice(), exchangeRateProvider.getExchangeRate(currencyProvider.getCurrency())));
+        return product;
     }
 
     /**
@@ -136,5 +167,21 @@ public class ProductService {
     @Transactional
     public void deleteAllProduct() {
         productRepository.deleteAll();
+    }
+
+    /**
+     * Вычисляет новую цену, разделив заданную цену на предоставленный обменный курс валюты,
+     * округленный до двух десятичных знаков с использованием режима округления {@link RoundingMode#HALF_UP}.
+     * <p>
+     * Этот метод обычно используется для корректировки цен в зависимости от колебаний валюты.
+     * </p>
+     *
+     * @param price    Исходная цена, которая должна быть скорректирована.
+     * @param currency Обменный курс валюты, используемый для корректировки.
+     * @return Новая цена, скорректированная согласно предоставленному обменному курсу валюты
+     * и округленная до двух десятичных знаков.
+     */
+    public BigDecimal getNewPrice(BigDecimal price, BigDecimal currency) {
+        return price.divide(currency, 2, RoundingMode.HALF_UP);
     }
 }
