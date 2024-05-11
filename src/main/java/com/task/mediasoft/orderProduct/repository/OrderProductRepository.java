@@ -16,16 +16,6 @@ import java.util.UUID;
 public interface OrderProductRepository extends JpaRepository<OrderProduct, OrderProductId> {
 
     /**
-     * Поиск товара в заказе по идентификаторам заказа и продукта.
-     *
-     * @param orderId   идентификатор заказа
-     * @param productId идентификатор продукта
-     * @return товар в заказе, если найден, иначе null
-     */
-    @Query("SELECT op FROM OrderProduct op WHERE op.order.id = :orderId AND op.product.id = :productId")
-    OrderProduct findOrderProduct(@Param("orderId") UUID orderId, @Param("productId") UUID productId);
-
-    /**
      * Поиск всех товаров в заказе по идентификатору заказа.
      *
      * @param orderId идентификатор заказа

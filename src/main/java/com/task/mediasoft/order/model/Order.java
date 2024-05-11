@@ -71,6 +71,7 @@ public class Order {
      * Продукты, входящие в заказ.
      */
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "order")
+    @Fetch(FetchMode.JOIN)
     private List<OrderProduct> orderProducts = new ArrayList<>();
 
     @Override

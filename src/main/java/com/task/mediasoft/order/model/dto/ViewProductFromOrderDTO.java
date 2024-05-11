@@ -1,6 +1,5 @@
 package com.task.mediasoft.order.model.dto;
 
-import com.task.mediasoft.orderProduct.model.OrderProduct;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -31,18 +30,6 @@ public class ViewProductFromOrderDTO {
      * Цена продукта.
      */
     private final BigDecimal price;
-
-    /**
-     * Создает новый объект ViewProductFromOrderDTO на основе сущности OrderProduct.
-     *
-     * @param orderProduct Сущность OrderProduct, из которой извлекаются данные для представления.
-     */
-    public ViewProductFromOrderDTO(OrderProduct orderProduct) {
-        this.productId = orderProduct.getProduct().getId();
-        this.name = orderProduct.getProduct().getName();
-        this.quantity = orderProduct.getQuantity();
-        this.price = orderProduct.getFrozenPrice();
-    }
 
     public ViewProductFromOrderDTO(UUID productId, String name, Long quantity, BigDecimal price) {
         this.productId = productId;

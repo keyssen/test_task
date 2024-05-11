@@ -96,7 +96,6 @@ public class OrderServiceImpl implements OrderService {
         idToQuantityProductMap.forEach((productId, totalQuantity) ->
                 currentOrderProductList.add((createOrderProduct(createdOrder, productId, totalQuantity, idToProductMap.get(productId))))
         );
-        orderProductRepository.saveAll(currentOrderProductList);
         return orderRepository.save(createdOrder);
     }
 
