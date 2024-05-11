@@ -1,9 +1,13 @@
 package com.task.mediasoft.product.controller;
 
 import com.task.mediasoft.product.controller.model.ProductPaginationModel;
+import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.model.dto.ViewProductDTO;
+import com.task.mediasoft.product.service.ExchangeRateProvider;
 import com.task.mediasoft.product.service.ProductService;
+import com.task.mediasoft.session.CurrencyEnum;
+import com.task.mediasoft.session.CurrencyProvider;
 import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +26,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -33,6 +40,8 @@ import java.util.UUID;
 public class ProductController {
 
     private final ProductService productService;
+    private final ExchangeRateProvider exchangeRateProvider;
+    private final CurrencyProvider currencyProvider;
 
     /**
      * Получает список всех продуктов с пагинацией и поиском.
@@ -47,7 +56,16 @@ public class ProductController {
                                                                  @RequestParam(defaultValue = "5") int size,
                                                                  @RequestParam(required = false) String search) {
         Page<ViewProductDTO> products = productService.getAllProducts(page, size, search).map(ViewProductDTO::new);
-        ProductPaginationModel response = new ProductPaginationModel(products.get().toList(), products.getTotalElements(), products.getTotalPages());
+        List<ViewProductDTO> viewProducts = new ArrayList<>();
+        CurrencyEnum currency = currencyProvider.getCurrency();
+        BigDecimal currencyPrice = exchangeRateProvider.getExchangeRate(currency);
+        for (Product product : productService.getAllProducts(page, size, search)) {
+            ViewProductDTO viewProductDTO = new ViewProductDTO(product);
+            viewProductDTO.setPrice(productService.getNewPrice(product.getPrice(), currencyPrice));
+            viewProductDTO.setCurrency(currency);
+            viewProducts.add(viewProductDTO);
+        }
+        ProductPaginationModel response = new ProductPaginationModel(viewProducts, products.getTotalElements(), products.getTotalPages());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -66,25 +84,29 @@ public class ProductController {
     }
 
     /**
-     * Получает продукт по его артикулу.
+     * Получает продукт по его артикулу и меняет валюту.
      *
      * @param article Артикул продукта.
      * @return Данные о продукте.
      */
     @GetMapping("/getProductByArticle/{article}")
     public ViewProductDTO getProductByArticle(@PathVariable String article) {
-        return new ViewProductDTO(productService.getProductByArticle(article));
+        ViewProductDTO viewProductDTO = new ViewProductDTO(productService.getProductByArticle(article));
+        viewProductDTO.setCurrency(currencyProvider.getCurrency());
+        return viewProductDTO;
     }
 
     /**
-     * Получает продукт по его идентификатору.
+     * Получает продукт по его идентификатору и меняет валюту.
      *
      * @param id Идентификатор продукта.
      * @return Данные о продукте.
      */
     @GetMapping("/{id}")
     public ViewProductDTO getProductById(@PathVariable UUID id) {
-        return new ViewProductDTO(productService.getProductById(id));
+        ViewProductDTO viewProductDTO = new ViewProductDTO(productService.getProductById(id));
+        viewProductDTO.setCurrency(currencyProvider.getCurrency());
+        return viewProductDTO;
     }
 
 

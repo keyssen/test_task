@@ -22,7 +22,15 @@ spring:
 
 app:
   scheduling:
-    enabled: true
+    enabled: false
     period: 60000 #ms
     priceIncreasePercentage: 10.1
     optimization: true
+
+rest:
+  currency-service:
+    mock:
+      enabled: false
+    host: http://localhost:8081 #хост второго сервиса
+    methods:
+      get-currency: /currencies #урл эндпоинта с курсами для GET запроса
