@@ -1,7 +1,6 @@
 package com.task.mediasoft.order.model;
 
 import com.task.mediasoft.customer.model.Customer;
-import com.task.mediasoft.order.model.dto.SaveOrderDTO;
 import com.task.mediasoft.orderProduct.model.OrderProduct;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -17,6 +16,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ public class Order {
     @NonNull
     @ManyToOne
     @JoinColumn(name = "customer_id", referencedColumnName = "id", nullable = false)
+    @Fetch(FetchMode.JOIN)
     private Customer customer;
 
     /**
@@ -70,24 +72,6 @@ public class Order {
      */
     @OneToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "order")
     private List<OrderProduct> orderProducts = new ArrayList<>();
-
-    /**
-     * Создает новый объект заказа на основе данных из DTO.
-     *
-     * @param saveOrderDTO DTO с данными о заказе.
-     */
-    public Order(SaveOrderDTO saveOrderDTO) {
-        this.deliveryAddress = saveOrderDTO.getDeliveryAddress();
-    }
-
-    /**
-     * Добавляет продукт к заказу.
-     *
-     * @param orderProduct Продукт для добавления к заказу.
-     */
-    public void addToOrderProducts(OrderProduct orderProduct) {
-        this.orderProducts.add(orderProduct);
-    }
 
     @Override
     public boolean equals(Object o) {

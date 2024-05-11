@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -52,6 +54,11 @@ public class ProductService {
     public Product getProductById(UUID id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundExceptionById(id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Product> getProductsByIdIn(Set<UUID> ids) {
+        return productRepository.findAllById(ids);
     }
 
     /**

@@ -4,7 +4,7 @@ import com.task.mediasoft.order.model.dto.ChangeStatusDTO;
 import com.task.mediasoft.order.model.dto.SaveOrderDTO;
 import com.task.mediasoft.order.model.dto.SaveOrderProductDTO;
 import com.task.mediasoft.order.model.dto.ViewOrderWithProductDTO;
-import com.task.mediasoft.order.service.OrderService;
+import com.task.mediasoft.order.service.OrderServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,7 +27,7 @@ import java.util.UUID;
 @RequestMapping("/orders")
 public class OrderController {
 
-    private final OrderService orderService;
+    private final OrderServiceImpl orderService;
 
     /**
      * Получить информацию о заказе по его идентификатору.
@@ -37,7 +37,7 @@ public class OrderController {
      */
     @GetMapping("/{id}")
     public ViewOrderWithProductDTO getOrderById(@PathVariable UUID id) {
-        return new ViewOrderWithProductDTO(id, orderService.getAllViewProductsByOrderId(id));
+        return orderService.getViewOrderWithProductDTO(id);
     }
 
 
@@ -48,8 +48,8 @@ public class OrderController {
      * @return Объект ViewOrderWithProductDTO с информацией о созданном заказе и его продуктах.
      */
     @PostMapping
-    public ViewOrderWithProductDTO createOrder(@Valid @RequestBody SaveOrderDTO orderDTO) {
-        return new ViewOrderWithProductDTO(orderService.createOrder(orderDTO));
+    public UUID createOrder(@Valid @RequestBody SaveOrderDTO orderDTO) {
+        return orderService.createOrder(orderDTO).getId();
     }
 
     /**
@@ -59,9 +59,8 @@ public class OrderController {
      * @return Объект ViewOrderWithProductDTO с информацией о заказе и его продуктах после подтверждения.
      */
     @PostMapping("/{orderId}/confirm")
-    public ViewOrderWithProductDTO confirmOrder(@PathVariable UUID orderId) {
+    public void confirmOrder(@PathVariable UUID orderId) {
         // todo
-        return null;
     }
 
     /**
@@ -72,8 +71,8 @@ public class OrderController {
      * @return Объект ViewOrderWithProductDTO с обновленной информацией о заказе и его продуктах.
      */
     @PatchMapping("/{orderId}")
-    public ViewOrderWithProductDTO updateOrder(@Valid @RequestBody List<SaveOrderProductDTO> products, @PathVariable UUID orderId) {
-        return new ViewOrderWithProductDTO(orderService.updateOrder(products, orderId));
+    public UUID updateOrder(@Valid @RequestBody List<SaveOrderProductDTO> products, @PathVariable UUID orderId) {
+        return orderService.updateOrder(products, orderId).getId();
     }
 
     /**
@@ -84,18 +83,17 @@ public class OrderController {
      * @return Объект ViewOrderWithProductDTO с обновленной информацией о заказе и его продуктах.
      */
     @PatchMapping("/{orderId}/status")
-    public ViewOrderWithProductDTO changeOrderStatus(@Valid @RequestBody ChangeStatusDTO changeStatusDTO, @PathVariable UUID orderId) {
-        return new ViewOrderWithProductDTO(orderService.changeOrderStatus(orderId, changeStatusDTO));
+    public void changeOrderStatus(@Valid @RequestBody ChangeStatusDTO changeStatusDTO, @PathVariable UUID orderId) {
+        orderService.changeOrderStatus(orderId, changeStatusDTO);
     }
 
     /**
      * Удалить заказ по его идентификатору.
      *
      * @param id Идентификатор заказа, который нужно удалить.
-     * @return Объект ViewOrderWithProductDTO с информацией о удаленном заказе и его продуктах.
      */
     @DeleteMapping("/{id}")
-    public ViewOrderWithProductDTO deleteOrderById(@PathVariable UUID id) {
-        return new ViewOrderWithProductDTO(orderService.deleteOrder(id));
+    public void deleteOrderById(@PathVariable UUID id) {
+        orderService.deleteOrder(id);
     }
 }
