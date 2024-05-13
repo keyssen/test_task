@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -85,8 +86,7 @@ public class OrderServiceImpl implements OrderService {
         currentOrder.setDeliveryAddress(createOrderDTO.getDeliveryAddress());
         currentOrder.setStatus(OrderStatus.CREATED);
         currentOrder.setCustomer(customerService.getCustomerById(customerIdProvider.getCustomerId()));
-        Order createdOrder = orderRepository.save(currentOrder);
-        final List<OrderProduct> currentOrderProductList = createdOrder.getOrderProducts();
+        final List<OrderProduct> currentOrderProductList = new ArrayList<>();
         Map<UUID, Long> idToQuantityProductMap = createOrderDTO.getProducts().stream()
                 .collect(Collectors.groupingBy(
                         SaveOrderProductDTO::getId,
@@ -94,10 +94,10 @@ public class OrderServiceImpl implements OrderService {
 
         Map<UUID, Product> idToProductMap = productService.getProductsByIdIn(idToQuantityProductMap.keySet()).stream().collect(Collectors.toMap(Product::getId, product -> product));
         idToQuantityProductMap.forEach((productId, totalQuantity) ->
-                currentOrderProductList.add((createOrderProduct(createdOrder, productId, totalQuantity, idToProductMap.get(productId))))
+                currentOrderProductList.add((createOrderProduct(currentOrder, productId, totalQuantity, idToProductMap.get(productId))))
         );
-        orderProductRepository.saveAll(currentOrderProductList);
-        return orderRepository.save(createdOrder);
+        currentOrder.setOrderProducts(currentOrderProductList);
+        return orderRepository.save(currentOrder);
     }
 
     /**
@@ -143,7 +143,6 @@ public class OrderServiceImpl implements OrderService {
                 }
             }
         });
-        orderProductRepository.saveAll(currentOrderProductList);
         return orderRepository.save(currentOrder);
     }
 

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Фильтр для установки идентификатора клиента в запросе.
@@ -30,11 +31,9 @@ public class CustomerIdFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String customerIdHeader = request.getHeader("customerId");
-        if (customerIdHeader != null) {
-            Long customerId = Long.valueOf(customerIdHeader);
-            customerIdProvider.setCustomerId(customerId);
-        }
+        Optional.ofNullable(request.getHeader("customerId"))
+                .map(Long::valueOf)
+                .ifPresent(customerIdProvider::setCustomerId);
         filterChain.doFilter(request, response);
     }
 }
