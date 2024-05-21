@@ -16,6 +16,8 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -113,6 +115,7 @@ public class Product {
 
 
     @OneToMany(mappedBy = "product")
+    @Fetch(FetchMode.JOIN)
     private List<OrderProduct> orderProducts;
 
     /**

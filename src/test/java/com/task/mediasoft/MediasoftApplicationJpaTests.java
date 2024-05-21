@@ -4,11 +4,13 @@ import com.task.mediasoft.product.model.CategoryType;
 import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.repository.ProductRepository;
+import com.task.mediasoft.product.service.ExchangeRateProvider;
 import com.task.mediasoft.product.service.ProductService;
 import com.task.mediasoft.product.service.searchCriteria.Criterial.BigDecimalSearchCriterial;
 import com.task.mediasoft.product.service.searchCriteria.Criterial.LocalDateTimeSearchCriterial;
 import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
 import com.task.mediasoft.product.service.searchCriteria.Criterial.StringSearchCriterial;
+import com.task.mediasoft.session.CurrencyProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -34,6 +36,13 @@ class MediasoftApplicationJpaTests {
 
     @Autowired
     ProductRepository productRepository;
+
+    @Autowired
+    CurrencyProvider currencyProvider;
+
+    @Autowired
+    ExchangeRateProvider exchangeRateProvider;
+
     ProductService productService;
 
 
@@ -61,7 +70,7 @@ class MediasoftApplicationJpaTests {
      */
     @BeforeAll
     void init() {
-        productService = new ProductService(productRepository);
+        productService = new ProductService(productRepository, currencyProvider, exchangeRateProvider);
         productService.createProduct(createProductDto(1, 5L));
         productService.createProduct(createProductDto(2, 10L));
         productService.createProduct(createProductDto(3, 15L));

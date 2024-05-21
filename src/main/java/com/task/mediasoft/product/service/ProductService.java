@@ -6,9 +6,9 @@ import com.task.mediasoft.product.exception.ProductWithArticleAlreadyExistsExcep
 import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.repository.ProductRepository;
-import com.task.mediasoft.session.CurrencyProvider;
 import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
 import com.task.mediasoft.product.service.searchCriteria.ProductSpecification;
+import com.task.mediasoft.session.CurrencyProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

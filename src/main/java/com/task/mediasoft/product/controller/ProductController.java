@@ -6,9 +6,9 @@ import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.model.dto.ViewProductDTO;
 import com.task.mediasoft.product.service.ExchangeRateProvider;
 import com.task.mediasoft.product.service.ProductService;
+import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
 import com.task.mediasoft.session.CurrencyEnum;
 import com.task.mediasoft.session.CurrencyProvider;
-import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
