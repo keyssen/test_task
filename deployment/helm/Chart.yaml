@@ -1,0 +1,11 @@
+apiVersion: v2
+name: productk8s
+version: 1.0.0
+description: Productk8s
+type: application
+sources:
+  - https://github.com/keyssen/mediasoft_test_task
+maintainers:
+  - name: Nikolay Raspaev
+    email: email
+appVersion: 1.0.0

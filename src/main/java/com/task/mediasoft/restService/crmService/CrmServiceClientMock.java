@@ -31,27 +31,22 @@ public class CrmServiceClientMock implements CrmService {
 
     @Override
     public CompletableFuture<Map<String, String>> getInns(List<String> logins) {
-        // Создаем CompletableFuture, который будет содержать результат запроса
+        log.info("Mock crm service is used");
         CompletableFuture<Map<String, String>> future = new CompletableFuture<>();
 
-        // В отдельном потоке генерируем данные
         new Thread(() -> {
-            // Генерация случайного кода для каждого логина
             Map<String, String> loginCodes = new HashMap<>();
             for (String login : logins) {
                 loginCodes.put(login, generateRandomCode());
             }
 
-            // Имитация задержки запроса
             try {
                 TimeUnit.SECONDS.sleep(3);
             } catch (InterruptedException e) {
-                // Если поток был прерван, отмечаем CompletableFuture как завершенный с исключением
                 future.completeExceptionally(e);
                 return;
             }
 
-            // После завершения задержки завершаем CompletableFuture с результатом
             future.complete(loginCodes);
         }).start();
 

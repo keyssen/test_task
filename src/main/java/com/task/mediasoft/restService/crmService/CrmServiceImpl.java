@@ -37,6 +37,7 @@ public class CrmServiceImpl implements CrmService {
      * @return CompletableFuture с картой, где ключом является логин, а значением - соответствующая информация об ИНН.
      */
     public CompletableFuture<Map<String, String>> getInns(List<String> logins) {
+        log.info("Impl crm service is used");
         return this.webClient.post()
                 .uri(crmServiceProperties.getMethods().getGetInn())
                 .body(Mono.just(logins), List.class)

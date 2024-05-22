@@ -37,6 +37,7 @@ public class AccountServiceImpl implements AccountService {
      * @return CompletableFuture с картой, где ключом является логин, а значением - соответствующая информация о аккаунте.
      */
     public CompletableFuture<Map<String, String>> getAccounts(List<String> logins) {
+        log.info("Impl account service is used");
         return this.webClient.post()
                 .uri(accountServiceProperties.getMethods().getGetAccount())
                 .body(Mono.just(logins), List.class)
