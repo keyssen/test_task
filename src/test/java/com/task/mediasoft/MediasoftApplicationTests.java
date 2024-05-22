@@ -73,48 +73,48 @@ class MediasoftApplicationTests {
         return saveProductDTO;
     }
 
-	/**
-	 * Подготовительные действия перед выполнением всех тестов.
-	 */
-	@BeforeAll
-	void init() {
-		productService.deleteAllProduct();
-	}
+    /**
+     * Подготовительные действия перед выполнением всех тестов.
+     */
+    @BeforeAll
+    void init() {
+        productService.deleteAllProduct();
+    }
 
-	/**
-	 * Действия после каждого тестового метода.
-	 */
-	@AfterEach
-	void down() {
-		productService.deleteAllProduct();
-	}
+    /**
+     * Действия после каждого тестового метода.
+     */
+    @AfterEach
+    void down() {
+        productService.deleteAllProduct();
+    }
 
-	/**
-	 * Тест поиска продуктов по артикулу.
-	 */
-	@Test
-	void searchProductsByArticle() {
-		final Product product1 = productService.createProduct(createProductDto(1));
-		final Product product2 = productService.createProduct(createProductDto(2));
-		log.info("product1: " + product1.toString());
-		log.info("product2: " + product2.toString());
-		Assertions.assertEquals(productService.getAllProducts(1, 5, "Product-1").get().count(), 1);
-	}
+    /**
+     * Тест поиска продуктов по артикулу.
+     */
+    @Test
+    void searchProductsByArticle() {
+        final Product product1 = productService.createProduct(createProductDto(1));
+        final Product product2 = productService.createProduct(createProductDto(2));
+        log.info("product1: " + product1.toString());
+        log.info("product2: " + product2.toString());
+        Assertions.assertEquals(productService.getAllProducts(1, 5, "Product-1").get().count(), 1);
+    }
 
-	/**
-	 * Тест поиска продуктов.
-	 */
-	@Test
-	void searchProducts() {
-		final Product product1 = productService.createProduct(createProductDto(1));
-		final Product product2 = productService.createProduct(createProductDto(2));
-		log.info("product1: " + product1.toString());
-		log.info("product2: " + product2.toString());
-		Assertions.assertEquals(productService.getAllProducts(1, 5, "Product1").get().count(), 1);
-		Assertions.assertEquals(productService.getAllProducts(1, 5, null).getTotalElements(), 2);
-		Assertions.assertEquals(productService.getAllProducts(1, 5, "product1").get().count(), 1);
-		Assertions.assertEquals(productService.getAllProducts(1, 5, "product").get().count(), 2);
-	}
+    /**
+     * Тест поиска продуктов.
+     */
+    @Test
+    void searchProducts() {
+        final Product product1 = productService.createProduct(createProductDto(1));
+        final Product product2 = productService.createProduct(createProductDto(2));
+        log.info("product1: " + product1.toString());
+        log.info("product2: " + product2.toString());
+        Assertions.assertEquals(productService.getAllProducts(1, 5, "Product1").get().count(), 1);
+        Assertions.assertEquals(productService.getAllProducts(1, 5, null).getTotalElements(), 2);
+        Assertions.assertEquals(productService.getAllProducts(1, 5, "product1").get().count(), 1);
+        Assertions.assertEquals(productService.getAllProducts(1, 5, "product").get().count(), 2);
+    }
 
     /**
      * Тест поиска продукта по идентификатору.
@@ -190,14 +190,14 @@ class MediasoftApplicationTests {
         Assertions.assertThrows(ProductNotFoundExceptionByArticle.class, () -> productService.getProductByArticle(product1.getArticle()));
     }
 
-	/**
-	 * Тест исключений для поиска продукта.
-	 */
-	@Test
-	void testProductReadNotFound() {
-		Assertions.assertThrows(ProductNotFoundExceptionById.class, () -> productService.getProductById(UUID.fromString("4a90898f-9d1d-477b-990a-e475ffb8238e")));
-		Assertions.assertThrows(ProductNotFoundExceptionByArticle.class, () -> productService.getProductByArticle("Product-1"));
-	}
+    /**
+     * Тест исключений для поиска продукта.
+     */
+    @Test
+    void testProductReadNotFound() {
+        Assertions.assertThrows(ProductNotFoundExceptionById.class, () -> productService.getProductById(UUID.fromString("4a90898f-9d1d-477b-990a-e475ffb8238e")));
+        Assertions.assertThrows(ProductNotFoundExceptionByArticle.class, () -> productService.getProductByArticle("Product-1"));
+    }
 
     /**
      * Тест исключения для обновления продукта с существующим артикулом.

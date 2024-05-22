@@ -6,9 +6,10 @@ import com.task.mediasoft.product.model.Product;
  * Исключение, выбрасываемое если продукт с данным артикулом уже существует.
  * {@link Product} с таким артикулом уже существует.
  */
-public class ProductWithArticleAlreadyExistsException extends RuntimeException{
+public class ProductWithArticleAlreadyExistsException extends RuntimeException {
     /**
      * Конструктор для создания исключения ProductWithArticleAlreadyExistsException с сообщением об ошибке.
+     *
      * @param article артикул продукта, который уже существует.
      */
     public ProductWithArticleAlreadyExistsException(String article) {

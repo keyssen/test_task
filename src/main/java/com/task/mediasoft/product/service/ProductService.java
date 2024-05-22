@@ -23,6 +23,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -83,6 +84,11 @@ public class ProductService {
         return product;
     }
 
+    @Transactional(readOnly = true)
+    public List<Product> getProductsByIdIn(Set<UUID> ids) {
+        return productRepository.findAllById(ids);
+    }
+
     /**
      * Получение продукта по артикулу и изменение его цены в соотвествии с валютой.
      *
@@ -138,6 +144,7 @@ public class ProductService {
         currentProduct.setCategory(updateProducttDTO.getCategory());
         currentProduct.setPrice(updateProducttDTO.getPrice());
         currentProduct.setQuantity(updateProducttDTO.getQuantity());
+        currentProduct.setIsAvailable(updateProducttDTO.getIsAvailable());
 
         return productRepository.save(currentProduct);
     }

@@ -69,4 +69,11 @@ public class SaveProductDTO {
     @NotNull(message = "Quantity is required")
     @PositiveOrZero(message = "Quantity must be a positive number")
     private Long quantity;
+
+    /**
+     * Доступность продукта.
+     * Не может быть пустым.
+     */
+    @NotNull(message = "available is required")
+    private Boolean isAvailable;
 }

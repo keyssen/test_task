@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="create-order-product" author="Nikolay">
+        <createTable tableName="order_product">
+            <column name="order_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="product_id" type="uuid">
+                <constraints nullable="false"/>
+            </column>
+            <column name="frozen_price" type="numeric(10, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="order_product"
+                                 baseColumnNames="order_id"
+                                 referencedTableName="orders"
+                                 referencedColumnNames="id"
+                                 constraintName="FK_orderProduct_order"
+                                 onDelete="RESTRICT"/>
+
+        <addForeignKeyConstraint baseTableName="order_product"
+                                 baseColumnNames="product_id"
+                                 referencedTableName="product"
+                                 referencedColumnNames="id"
+                                 constraintName="FK_orderProduct_product"
+                                 onDelete="RESTRICT"/>
+
+        <addPrimaryKey
+                columnNames="order_id, product_id"
+                constraintName="PK_orderProduct"
+                tableName="order_product"/>
+
+    </changeSet>
+</databaseChangeLog>
