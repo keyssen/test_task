@@ -4,4 +4,9 @@ metadata:
   name: product-configmap
   namespace: myspace
 data:
-  PROFILES: "{{ .Values.spring.profiles }}"
+  PROFILES: "prod"
+  DATABASE_NAME: "mediasoft_test"
+  DATABASE_URL: "jdbc:postgresql://postgresql-productk8s-postgres-service:5432"
+  DATABASE_SCHEMA: "public"
+  SPRING_DATASOURCE_USERNAME: "postgres"
+  SPRING_DATASOURCE_PASSWORD: "password"
