@@ -87,8 +87,6 @@ public class OrderServiceImpl implements OrderService {
      * Получает информацию о продуктах из базы данных.
      *
      * @return Карта, где ключом является UUID продукта, а значением - список информации о заказах, содержащих этот продукт.
-     * @throws ExecutionException   если вычисление завершилось с исключением.
-     * @throws InterruptedException если поток выполнения был прерван.
      */
     @Transactional(readOnly = true)
     public Map<UUID, List<OrderInfo>> getProductsInfo() {
