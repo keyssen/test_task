@@ -38,7 +38,7 @@ rest:
 
   account-service:
     mock:
-      enabled: false
+      enabled: true
     #    host: ${ACCOUNT_URL:http://localhost:8082} #хост сервиса аккаунтов
     host: ${ACCOUNT_URL:http://account-service.myspace.svc.cluster.local:8080} #хост сервиса аккаунтов
     methods:
@@ -46,7 +46,7 @@ rest:
 
   crm-service:
     mock:
-      enabled: false
+      enabled: true
     #    host: ${CRM_URL:http://localhost:8083} #хост CRM сервиса
     host: ${CRM_URL:http://crm-service.myspace.svc.cluster.local:8080} #хост CRM сервиса
     methods:

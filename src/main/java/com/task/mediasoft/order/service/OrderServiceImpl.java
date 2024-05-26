@@ -94,21 +94,8 @@ public class OrderServiceImpl implements OrderService {
                 .map(Customer::getLogin)
                 .toList();
 
-        CompletableFuture<Map<String, String>> accountNumbersFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                return accountService.getAccounts(logins).get();
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        CompletableFuture<Map<String, String>> innsFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                return crmService.getInns(logins).get();
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        CompletableFuture<Map<String, String>> accountNumbersFuture = accountService.getAccounts(logins);
+        CompletableFuture<Map<String, String>> innsFuture = crmService.getInns(logins);
 
         try {
             Map<String, String> accountNumbers = accountNumbersFuture.get();
