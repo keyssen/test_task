@@ -70,6 +70,7 @@ class MediasoftApplicationTests {
         saveProductDTO.setQuantity(10L);
         saveProductDTO.setPrice(BigDecimal.valueOf(10.1));
         saveProductDTO.setArticle("Product-" + number);
+        saveProductDTO.setIsAvailable(true);
         return saveProductDTO;
     }
 

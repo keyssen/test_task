@@ -6,9 +6,6 @@ spring:
     driverClassName: org.h2.Driver
 
   jpa:
-    properties:
-      hibernate:
-        globally_quoted_identifiers: true
     hibernate:
       ddl-auto: create
       show-sql: true
@@ -22,3 +19,12 @@ spring:
 
   liquibase:
     enabled: false
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+rest:
+  currency-service:
+    mock:
+      enabled: true
+    host: http://localhost:8081 #хост второго сервиса
+    methods:
+      get-currency: /currencies #урл эндпоинта с курсами для GET запроса
