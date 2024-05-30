@@ -12,15 +12,15 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface OrderService {
-    ViewOrderWithProductDTO getViewOrderWithProductDTO(UUID id);
+    ViewOrderWithProductDTO getViewOrderWithProductDTO(UUID id, Long customerId);
 
     Map<UUID, List<OrderInfo>> getProductsInfo();
 
-    Order createOrder(SaveOrderDTO createOrderDTO);
+    Order createOrder(SaveOrderDTO createOrderDTO, Long customerId);
 
-    Order updateOrder(List<SaveOrderProductDTO> products, UUID orderId);
+    Order updateOrder(List<SaveOrderProductDTO> products, UUID orderId, Long customerId);
 
     Order changeOrderStatus(UUID id, ChangeStatusDTO changeStatusDTO);
 
-    Order deleteOrder(UUID id);
+    Order deleteOrder(UUID id, Long customerId);
 }

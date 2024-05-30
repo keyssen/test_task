@@ -27,6 +27,10 @@ app:
     priceIncreasePercentage: 10.1
     optimization: true
 
+kafka:
+  bootstrapAddress: localhost:9091
+  groupId: group1
+
 rest:
   currency-service:
     mock:

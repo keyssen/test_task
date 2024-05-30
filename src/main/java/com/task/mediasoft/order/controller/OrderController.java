@@ -6,6 +6,7 @@ import com.task.mediasoft.order.model.dto.SaveOrderProductDTO;
 import com.task.mediasoft.order.model.dto.ViewOrderWithProductDTO;
 import com.task.mediasoft.order.service.OrderServiceImpl;
 import com.task.mediasoft.product.controller.model.OrderInfo;
+import com.task.mediasoft.session.CustomerIdProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,6 +32,8 @@ public class OrderController {
 
     private final OrderServiceImpl orderService;
 
+    private final CustomerIdProvider customerIdProvider;
+
     /**
      * Получить информацию о заказе по его идентификатору.
      *
@@ -39,7 +42,7 @@ public class OrderController {
      */
     @GetMapping("/{id}")
     public ViewOrderWithProductDTO getOrderById(@PathVariable UUID id) {
-        return orderService.getViewOrderWithProductDTO(id);
+        return orderService.getViewOrderWithProductDTO(id, customerIdProvider.getCustomerId());
     }
 
     /**
@@ -60,7 +63,7 @@ public class OrderController {
      */
     @PostMapping
     public UUID createOrder(@Valid @RequestBody SaveOrderDTO orderDTO) {
-        return orderService.createOrder(orderDTO).getId();
+        return orderService.createOrder(orderDTO, customerIdProvider.getCustomerId()).getId();
     }
 
     /**
@@ -83,7 +86,7 @@ public class OrderController {
      */
     @PatchMapping("/{orderId}")
     public UUID updateOrder(@Valid @RequestBody List<SaveOrderProductDTO> products, @PathVariable UUID orderId) {
-        return orderService.updateOrder(products, orderId).getId();
+        return orderService.updateOrder(products, orderId, customerIdProvider.getCustomerId()).getId();
     }
 
     /**
@@ -105,6 +108,6 @@ public class OrderController {
      */
     @DeleteMapping("/{id}")
     public void deleteOrderById(@PathVariable UUID id) {
-        orderService.deleteOrder(id);
+        orderService.deleteOrder(id, customerIdProvider.getCustomerId());
     }
 }

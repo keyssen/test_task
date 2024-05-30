@@ -23,7 +23,6 @@ import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.service.ProductService;
 import com.task.mediasoft.restService.accountService.AccountService;
 import com.task.mediasoft.restService.crmService.CrmService;
-import com.task.mediasoft.session.CustomerIdProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,7 +48,6 @@ public class OrderServiceImpl implements OrderService {
     private final CustomerService customerService;
     private final AccountService accountService;
     private final CrmService crmService;
-    private final CustomerIdProvider customerIdProvider;
 
     /**
      * Получает заказ по его идентификатору.
@@ -73,9 +71,9 @@ public class OrderServiceImpl implements OrderService {
      * @throws OrderForbiddenCustomerException Если текущий клиент не имеет доступа к заказу.
      */
     @Transactional(readOnly = true)
-    public ViewOrderWithProductDTO getViewOrderWithProductDTO(UUID id) {
-        if (!orderRepository.existsByIdAndCustomer_Id(id, customerIdProvider.getCustomerId()))
-            throw new OrderForbiddenCustomerException(customerIdProvider.getCustomerId());
+    public ViewOrderWithProductDTO getViewOrderWithProductDTO(UUID id, Long customerId) {
+        if (!orderRepository.existsByIdAndCustomer_Id(id, customerId))
+            throw new OrderForbiddenCustomerException(customerId);
         final List<ViewProductFromOrderDTO> products = orderProductRepository.findAllViewProductsByOrderId(id);
         final BigDecimal totalPrice = products.stream()
                 .map(product -> product.getPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
@@ -143,11 +141,11 @@ public class OrderServiceImpl implements OrderService {
      * @return Созданный заказ.
      */
     @Transactional
-    public Order createOrder(SaveOrderDTO createOrderDTO) {
+    public Order createOrder(SaveOrderDTO createOrderDTO, Long customerId) {
         final Order currentOrder = new Order();
         currentOrder.setDeliveryAddress(createOrderDTO.getDeliveryAddress());
         currentOrder.setStatus(OrderStatus.CREATED);
-        currentOrder.setCustomer(customerService.getCustomerById(customerIdProvider.getCustomerId()));
+        currentOrder.setCustomer(customerService.getCustomerById(customerId));
         final List<OrderProduct> currentOrderProductList = new ArrayList<>();
         Map<UUID, Long> idToQuantityProductMap = createOrderDTO.getProducts().stream()
                 .collect(Collectors.groupingBy(
@@ -172,12 +170,12 @@ public class OrderServiceImpl implements OrderService {
      * @throws OrderForbiddenCustomerException Если текущий клиент не имеет доступа к заказу.
      */
     @Transactional
-    public Order updateOrder(List<SaveOrderProductDTO> products, UUID orderId) {
+    public Order updateOrder(List<SaveOrderProductDTO> products, UUID orderId, Long customerId) {
         final Order currentOrder = getOrderById(orderId);
         if (currentOrder.getStatus() != OrderStatus.CREATED) {
             throw new OrderStatusException(OrderStatus.CREATED);
-        } else if (!currentOrder.getCustomer().getId().equals(customerIdProvider.getCustomerId())) {
-            throw new OrderForbiddenCustomerException(customerIdProvider.getCustomerId());
+        } else if (!currentOrder.getCustomer().getId().equals(customerId)) {
+            throw new OrderForbiddenCustomerException(customerId);
         }
         final List<OrderProduct> currentOrderProductList = currentOrder.getOrderProducts();
 
@@ -258,13 +256,13 @@ public class OrderServiceImpl implements OrderService {
      * @throws OrderForbiddenCustomerException Если текущий клиент не имеет доступа к заказу.
      */
     @Transactional
-    public Order deleteOrder(UUID id) {
+    public Order deleteOrder(UUID id, Long customerId) {
         final Order currentOrder = getOrderById(id);
         if (currentOrder.getStatus() != OrderStatus.CREATED) {
             throw new OrderStatusException(OrderStatus.CREATED);
         }
-        if (!currentOrder.getCustomer().getId().equals(customerIdProvider.getCustomerId())) {
-            throw new OrderForbiddenCustomerException(customerIdProvider.getCustomerId());
+        if (!currentOrder.getCustomer().getId().equals(customerId)) {
+            throw new OrderForbiddenCustomerException(customerId);
         }
         currentOrder.setStatus(OrderStatus.CANCELLED);
         currentOrder.getOrderProducts().forEach(orderProduct -> {
