@@ -2,6 +2,7 @@ package com.task.mediasoft.product.service.currencyService;
 
 import com.task.mediasoft.configuration.properties.currencyService.CurrencyServiceProperties;
 import com.task.mediasoft.product.model.dto.ViewCurrenciesDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 @Service
 @CacheConfig(cacheNames = {"currencyCache"})
+@RequiredArgsConstructor
 public class CurrencyServiceClientImpl implements CurrencyServiceClient {
 
     /**
@@ -27,12 +29,7 @@ public class CurrencyServiceClientImpl implements CurrencyServiceClient {
     /**
      * WebClient для взаимодействия с внешним API.
      */
-    private final WebClient webClient;
-
-    public CurrencyServiceClientImpl(CurrencyServiceProperties currencyServiceProperties) {
-        this.currencyServiceProperties = currencyServiceProperties;
-        this.webClient = WebClient.create(currencyServiceProperties.getHost());
-    }
+    private final WebClient currencyServiceWebClient;
 
     /**
      * Получает данные о курсах валют от внешнего API.
@@ -42,7 +39,7 @@ public class CurrencyServiceClientImpl implements CurrencyServiceClient {
     @Cacheable(cacheNames = "currencyCache")
     public ViewCurrenciesDto getCurrencies() {
         log.info("IMPLEMENTATION");
-        return this.webClient.get().uri(currencyServiceProperties.getMethods().getGetCurrency())
+        return this.currencyServiceWebClient.get().uri(currencyServiceProperties.getMethods().getGetCurrency())
                 .retrieve()
                 .bodyToMono(ViewCurrenciesDto.class)
                 .retry(2)

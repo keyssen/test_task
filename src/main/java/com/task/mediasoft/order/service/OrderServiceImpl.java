@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
@@ -97,43 +96,34 @@ public class OrderServiceImpl implements OrderService {
         CompletableFuture<Map<String, String>> accountNumbersFuture = accountService.getAccounts(logins);
         CompletableFuture<Map<String, String>> innsFuture = crmService.getInns(logins);
 
-        try {
-            Map<String, String> accountNumbers = accountNumbersFuture.get();
-            Map<String, String> inns = innsFuture.get();
-
-            List<OrderProduct> ordersProducts = orderRepository.findAll().stream()
-                    .filter(order -> order.getStatus() == OrderStatus.CREATED || order.getStatus() == OrderStatus.CONFIRMED)
-                    .flatMap(order -> order.getOrderProducts().stream()).toList();
-
-            return ordersProducts.stream()
-                    .collect(Collectors.groupingBy(OrderProduct::getProduct))
-                    .entrySet()
-                    .stream()
-                    .collect(Collectors.toMap(
-                            entry -> entry.getKey().getId(),
-                            entry -> entry.getValue().stream()
-                                    .map(orderProduct -> {
-                                        Order order = orderProduct.getOrder();
-                                        Customer customer = order.getCustomer();
-                                        CustomerInfo customerInfo = new CustomerInfo(
-                                                customer.getId(),
-                                                accountNumbers.get(customer.getLogin()),
-                                                customer.getEmail(),
-                                                inns.get(customer.getLogin())
-                                        );
-                                        return new OrderInfo(
-                                                order.getId(),
-                                                customerInfo,
-                                                order.getStatus(),
-                                                order.getDeliveryAddress(),
-                                                orderProduct.getQuantity()
-                                        );
-                                    })
-                                    .toList()
-                    ));
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException("Ошибка при получении результатов запросов: " + e.getMessage(), e);
-        }
+        return orderRepository.findAll().stream()
+                .filter(order -> order.getStatus() == OrderStatus.CREATED || order.getStatus() == OrderStatus.CONFIRMED)
+                .flatMap(order -> order.getOrderProducts().stream())
+                .collect(Collectors.groupingBy(OrderProduct::getProduct))
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().getId(),
+                        entry -> entry.getValue().stream()
+                                .map(orderProduct -> {
+                                    Order order = orderProduct.getOrder();
+                                    Customer customer = order.getCustomer();
+                                    CustomerInfo customerInfo = new CustomerInfo(
+                                            customer.getId(),
+                                            accountNumbersFuture.join().get(customer.getLogin()),
+                                            customer.getEmail(),
+                                            innsFuture.join().get(customer.getLogin())
+                                    );
+                                    return new OrderInfo(
+                                            order.getId(),
+                                            customerInfo,
+                                            order.getStatus(),
+                                            order.getDeliveryAddress(),
+                                            orderProduct.getQuantity()
+                                    );
+                                })
+                                .toList()
+                ));
     }
 
     /**

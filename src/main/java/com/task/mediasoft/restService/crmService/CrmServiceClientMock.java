@@ -29,12 +29,19 @@ public class CrmServiceClientMock implements CrmService {
     private static final int codeLength = 10;
     private static final Random random = new Random();
 
+    private static String generateRandomCode() {
+        StringBuilder code = new StringBuilder(codeLength);
+        for (int i = 0; i < codeLength; i++) {
+            int digit = random.nextInt(10);
+            code.append(digit);
+        }
+        return code.toString();
+    }
+
     @Override
     public CompletableFuture<Map<String, String>> getInns(List<String> logins) {
         log.info("Mock crm service is used");
-        CompletableFuture<Map<String, String>> future = new CompletableFuture<>();
-
-        new Thread(() -> {
+        return CompletableFuture.supplyAsync(() -> {
             Map<String, String> loginCodes = new HashMap<>();
             for (String login : logins) {
                 loginCodes.put(login, generateRandomCode());
@@ -43,22 +50,10 @@ public class CrmServiceClientMock implements CrmService {
             try {
                 TimeUnit.SECONDS.sleep(3);
             } catch (InterruptedException e) {
-                future.completeExceptionally(e);
-                return;
+                throw new RuntimeException(e);
             }
 
-            future.complete(loginCodes);
-        }).start();
-
-        return future;
-    }
-
-    private static String generateRandomCode() {
-        StringBuilder code = new StringBuilder(codeLength);
-        for (int i = 0; i < codeLength; i++) {
-            int digit = random.nextInt(10);
-            code.append(digit);
-        }
-        return code.toString();
+            return loginCodes;
+        });
     }
 }

@@ -29,30 +29,6 @@ public class AccountServiceClientMock implements AccountService {
     private static final int codeLength = 8;
     private static final Random random = new Random();
 
-    @Override
-    public CompletableFuture<Map<String, String>> getAccounts(List<String> logins) {
-        log.info("Mock account service is used");
-        CompletableFuture<Map<String, String>> future = new CompletableFuture<>();
-
-        new Thread(() -> {
-            Map<String, String> loginCodes = new HashMap<>();
-            for (String login : logins) {
-                loginCodes.put(login, generateRandomCode());
-            }
-
-            try {
-                TimeUnit.SECONDS.sleep(3);
-            } catch (InterruptedException e) {
-                future.completeExceptionally(e);
-                return;
-            }
-
-            future.complete(loginCodes);
-        }).start();
-
-        return future;
-    }
-
     private static String generateRandomCode() {
         StringBuilder code = new StringBuilder(codeLength);
         for (int i = 0; i < codeLength; i++) {
@@ -60,5 +36,24 @@ public class AccountServiceClientMock implements AccountService {
             code.append(digit);
         }
         return code.toString();
+    }
+
+    @Override
+    public CompletableFuture<Map<String, String>> getAccounts(List<String> logins) {
+        log.info("Mock account service is used");
+
+        return CompletableFuture.supplyAsync(() -> {
+            Map<String, String> loginCodes = new HashMap<>();
+            for (String login : logins) {
+                loginCodes.put(login, generateRandomCode());
+            }
+            try {
+                TimeUnit.SECONDS.sleep(3);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            return loginCodes;
+        });
     }
 }

@@ -1,6 +1,7 @@
 package com.task.mediasoft.restService.accountService;
 
 import com.task.mediasoft.configuration.properties.accountService.AccountServiceProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
     /**
@@ -23,12 +25,7 @@ public class AccountServiceImpl implements AccountService {
     /**
      * WebClient для взаимодействия с внешним API.
      */
-    private final WebClient webClient;
-
-    public AccountServiceImpl(AccountServiceProperties accountServiceProperties) {
-        this.accountServiceProperties = accountServiceProperties;
-        this.webClient = WebClient.create(accountServiceProperties.getHost());
-    }
+    private final WebClient accountServiceWebClient;
 
     /**
      * Получает данные о аккаунтах от внешнего API.
@@ -38,7 +35,7 @@ public class AccountServiceImpl implements AccountService {
      */
     public CompletableFuture<Map<String, String>> getAccounts(List<String> logins) {
         log.info("Impl account service is used");
-        return this.webClient.post()
+        return this.accountServiceWebClient.post()
                 .uri(accountServiceProperties.getMethods().getGetAccount())
                 .body(Mono.just(logins), List.class)
                 .retrieve()

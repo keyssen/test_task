@@ -1,6 +1,7 @@
 package com.task.mediasoft.restService.crmService;
 
 import com.task.mediasoft.configuration.properties.crmService.CrmServiceProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CrmServiceImpl implements CrmService {
 
     /**
@@ -23,12 +25,7 @@ public class CrmServiceImpl implements CrmService {
     /**
      * WebClient для взаимодействия с внешним API.
      */
-    private final WebClient webClient;
-
-    public CrmServiceImpl(CrmServiceProperties crmServiceProperties) {
-        this.crmServiceProperties = crmServiceProperties;
-        this.webClient = WebClient.create(crmServiceProperties.getHost());
-    }
+    private final WebClient crmServiceWebClient;
 
     /**
      * Получает данные о ИНН от внешнего API.
@@ -38,7 +35,7 @@ public class CrmServiceImpl implements CrmService {
      */
     public CompletableFuture<Map<String, String>> getInns(List<String> logins) {
         log.info("Impl crm service is used");
-        return this.webClient.post()
+        return this.crmServiceWebClient.post()
                 .uri(crmServiceProperties.getMethods().getGetInn())
                 .body(Mono.just(logins), List.class)
                 .retrieve()
