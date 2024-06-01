@@ -6,6 +6,7 @@ import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.repository.ProductRepository;
 import com.task.mediasoft.product.service.ExchangeRateProvider;
 import com.task.mediasoft.product.service.ProductService;
+import com.task.mediasoft.product.service.currencyService.CurrencyServiceClientMock;
 import com.task.mediasoft.product.service.searchCriteria.Criterial.BigDecimalSearchCriterial;
 import com.task.mediasoft.product.service.searchCriteria.Criterial.LocalDateTimeSearchCriterial;
 import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
@@ -37,12 +38,6 @@ class MediasoftApplicationJpaTests {
     @Autowired
     ProductRepository productRepository;
 
-    @Autowired
-    CurrencyProvider currencyProvider;
-
-    @Autowired
-    ExchangeRateProvider exchangeRateProvider;
-
     ProductService productService;
 
 
@@ -61,6 +56,7 @@ class MediasoftApplicationJpaTests {
         saveProductDTO.setQuantity(quantity);
         saveProductDTO.setPrice(BigDecimal.valueOf(100.1));
         saveProductDTO.setArticle("Article-" + number);
+        saveProductDTO.setIsAvailable(true);
         return saveProductDTO;
     }
 
@@ -70,7 +66,7 @@ class MediasoftApplicationJpaTests {
      */
     @BeforeAll
     void init() {
-        productService = new ProductService(productRepository, currencyProvider, exchangeRateProvider);
+        productService = new ProductService(productRepository, new CurrencyProvider(), new ExchangeRateProvider(new CurrencyServiceClientMock()));
         productService.createProduct(createProductDto(1, 5L));
         productService.createProduct(createProductDto(2, 10L));
         productService.createProduct(createProductDto(3, 15L));
