@@ -169,7 +169,7 @@ public class ProductService {
             throw new RuntimeException("Please select a file to upload.");
         }
         try {
-            s3ServiceImpl.addFile(id, file);
+            s3ServiceImpl.addFile(String.format("%s/%s", id, fileName), file);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to upload file.");

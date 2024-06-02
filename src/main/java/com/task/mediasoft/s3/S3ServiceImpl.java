@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -49,7 +48,7 @@ public class S3ServiceImpl implements S3Service {
         }
     }
 
-    public void addFile(UUID id, MultipartFile file) throws IOException {
+    public void addFile(String fullFileName, MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw new RuntimeException("Please select a file to upload.");
         }
@@ -58,7 +57,7 @@ public class S3ServiceImpl implements S3Service {
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(fileContent)) {
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentLength(fileContent.length);
-            s3Client.putObject(s3Properties.getBucket(), String.format("%s/%s", id, file.getOriginalFilename()), inputStream, metadata);
+            s3Client.putObject(s3Properties.getBucket(), fullFileName, inputStream, metadata);
         }
     }
 }
