@@ -30,7 +30,14 @@ app:
 rest:
   currency-service:
     mock:
-      enabled: false
+      enabled: true
     host: http://localhost:8081 #хост второго сервиса
     methods:
       get-currency: /currencies #урл эндпоинта с курсами для GET запроса
+
+s3:
+  accessKeyId: test
+  secretAccessKey: test
+  serviceEndpoint: s3.localhost.localstack.cloud:4566
+  bucket: new-bucket-1cfe466e
+  signingRegion: eu-central-1

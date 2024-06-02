@@ -1,14 +1,17 @@
 package com.task.mediasoft.product.service;
 
+import com.task.mediasoft.configuration.properties.S3Properties;
+import com.task.mediasoft.image.service.ImageService;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionByArticle;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionById;
 import com.task.mediasoft.product.exception.ProductWithArticleAlreadyExistsException;
 import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.repository.ProductRepository;
-import com.task.mediasoft.session.CurrencyProvider;
 import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
 import com.task.mediasoft.product.service.searchCriteria.ProductSpecification;
+import com.task.mediasoft.s3.S3Service;
+import com.task.mediasoft.session.CurrencyProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,7 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
@@ -36,6 +41,9 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CurrencyProvider currencyProvider;
     private final ExchangeRateProvider exchangeRateProvider;
+    private final ImageService imageService;
+    private final S3Service s3ServiceImpl;
+    private final S3Properties s3Properties;
 
     /**
      * Получение продуктов с возможностью поиска по строке.
@@ -147,6 +155,27 @@ public class ProductService {
         currentProduct.setIsAvailable(updateProducttDTO.getIsAvailable());
 
         return productRepository.save(currentProduct);
+    }
+
+    @Transactional
+    public boolean addImageToProduct(UUID id, MultipartFile file) {
+        String fileName = file.getOriginalFilename();
+        boolean containsImage = imageService.getImagesByProductId(id).stream().anyMatch(image -> image.getUrl().equals(String.format("%s/%s/%s/%s", s3Properties.getServiceEndpoint(), s3Properties.getBucket(), id, fileName)));
+        if (!containsImage) {
+            imageService.createImage(getProductById(id), fileName);
+        }
+
+        if (file.isEmpty()) {
+            throw new RuntimeException("Please select a file to upload.");
+        }
+        try {
+            s3ServiceImpl.addFile(id, file);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to upload file.");
+        }
+
+        return true;
     }
 
     /**

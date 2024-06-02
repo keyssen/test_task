@@ -6,14 +6,20 @@ import com.task.mediasoft.product.model.dto.SaveProductDTO;
 import com.task.mediasoft.product.model.dto.ViewProductDTO;
 import com.task.mediasoft.product.service.ExchangeRateProvider;
 import com.task.mediasoft.product.service.ProductService;
+import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
+import com.task.mediasoft.s3.S3Service;
 import com.task.mediasoft.session.CurrencyEnum;
 import com.task.mediasoft.session.CurrencyProvider;
-import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,8 +30,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +48,7 @@ public class ProductController {
     private final ProductService productService;
     private final ExchangeRateProvider exchangeRateProvider;
     private final CurrencyProvider currencyProvider;
+    private final S3Service s3ServiceImpl;
 
     /**
      * Получает список всех продуктов с пагинацией и поиском.
@@ -139,6 +146,29 @@ public class ProductController {
      * @param id Идентификатор продукта.
      * @return Ответ об успешном удалении.
      */
+
+    @PostMapping("/upload/{id}")
+    public boolean addFileToProduct(@PathVariable UUID id, @RequestParam("file") MultipartFile file) {
+        return productService.addImageToProduct(id, file);
+    }
+
+    @GetMapping("/download/{id}")
+    public ResponseEntity<Resource> download(@PathVariable UUID id) {
+        Pair<byte[], String> pair = s3ServiceImpl.getZip(productService.getProductById(id));
+        byte[] zip = pair.getFirst();
+        String name = pair.getSecond();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", String.format("%s.zip", name));
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(new ByteArrayResource(zip));
+    }
+
+
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable UUID id) {
         productService.deleteProduct(id);
