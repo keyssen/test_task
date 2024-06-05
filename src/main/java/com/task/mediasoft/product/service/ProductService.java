@@ -1,6 +1,7 @@
 package com.task.mediasoft.product.service;
 
 import com.task.mediasoft.configuration.properties.S3Properties;
+import com.task.mediasoft.image.Image;
 import com.task.mediasoft.image.service.ImageService;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionByArticle;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionById;
@@ -158,18 +159,14 @@ public class ProductService {
     }
 
     @Transactional
-    public boolean addImageToProduct(UUID id, MultipartFile file) {
+    public boolean addImageToProduct(UUID productId, MultipartFile file) {
         String fileName = file.getOriginalFilename();
-        boolean containsImage = imageService.getImagesByProductId(id).stream().anyMatch(image -> image.getUrl().equals(String.format("%s/%s/%s/%s", s3Properties.getServiceEndpoint(), s3Properties.getBucket(), id, fileName)));
-        if (!containsImage) {
-            imageService.createImage(getProductById(id), fileName);
-        }
-
+        Image iamge = imageService.createImage(getProductById(productId));
         if (file.isEmpty()) {
             throw new RuntimeException("Please select a file to upload.");
         }
         try {
-            s3ServiceImpl.addFile(String.format("%s/%s", id, fileName), file);
+            s3ServiceImpl.addFile(productId, iamge.getId(), file);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to upload file.");

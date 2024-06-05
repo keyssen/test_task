@@ -27,12 +27,6 @@ public class Image {
     @Column(name = "id", nullable = false, updatable = false, columnDefinition = "UUID")
     private UUID id;
 
-    @Column(name = "url", nullable = false)
-    private String url;
-
-    @Column(name = "file_name", nullable = false)
-    private String fileName;
-    
     @NonNull
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id", nullable = false)

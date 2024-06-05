@@ -39,5 +39,5 @@ s3:
   accessKeyId: test
   secretAccessKey: test
   serviceEndpoint: s3.localhost.localstack.cloud:4566
-  bucket: new-bucket-1cfe466e
+  bucket: new-bucket-9109ce4b
   signingRegion: eu-central-1

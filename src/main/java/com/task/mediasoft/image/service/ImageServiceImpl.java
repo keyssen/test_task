@@ -28,11 +28,9 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Transactional
-    public void createImage(Product product, String fileName) {
+    public Image createImage(Product product) {
         Image image = new Image();
         image.setProduct(product);
-        image.setUrl(String.format("%s/%s/%s/%s", s3Properties.getServiceEndpoint(), s3Properties.getBucket(), product.getId(), fileName));
-        image.setFileName(String.format("%s", fileName));
-        imageRepository.save(image);
+        return imageRepository.save(image);
     }
 }

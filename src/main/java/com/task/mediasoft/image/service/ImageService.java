@@ -9,5 +9,5 @@ import java.util.UUID;
 public interface ImageService {
     List<Image> getImagesByProductId(UUID productId);
 
-    void createImage(Product product, String fileName);
+    Image createImage(Product product);
 }
