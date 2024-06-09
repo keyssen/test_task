@@ -1,6 +1,6 @@
 package com.task.mediasoft.product.service.currencyService;
 
-import com.task.mediasoft.configuration.properties.ConfigProperties;
+import com.task.mediasoft.configuration.properties.currencyService.CurrencyServiceProperties;
 import com.task.mediasoft.product.model.dto.ViewCurrenciesDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,19 +17,19 @@ import org.springframework.web.reactive.function.client.WebClient;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 @CacheConfig(cacheNames = {"currencyCache"})
+@RequiredArgsConstructor
 public class CurrencyServiceClientImpl implements CurrencyServiceClient {
-    /**
-     * WebClient для взаимодействия с внешним API.
-     */
-    private final WebClient webClient;
 
     /**
      * Конфигурационные свойства для взаимодействия с API валют.
      */
-    private final ConfigProperties configProperties;
+    private final CurrencyServiceProperties currencyServiceProperties;
 
+    /**
+     * WebClient для взаимодействия с внешним API.
+     */
+    private final WebClient currencyServiceWebClient;
 
     /**
      * Получает данные о курсах валют от внешнего API.
@@ -39,7 +39,7 @@ public class CurrencyServiceClientImpl implements CurrencyServiceClient {
     @Cacheable(cacheNames = "currencyCache")
     public ViewCurrenciesDto getCurrencies() {
         log.info("IMPLEMENTATION");
-        return this.webClient.get().uri(configProperties.getMethods().getGetCurrency())
+        return this.currencyServiceWebClient.get().uri(currencyServiceProperties.getMethods().getGetCurrency())
                 .retrieve()
                 .bodyToMono(ViewCurrenciesDto.class)
                 .retry(2)

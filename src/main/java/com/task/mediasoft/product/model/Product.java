@@ -10,12 +10,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
@@ -35,7 +36,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "product")
-@Builder
 public class Product {
     /**
      * Уникальный идентификатор продукта.
@@ -113,6 +113,7 @@ public class Product {
 
 
     @OneToMany(mappedBy = "product")
+    @Fetch(FetchMode.JOIN)
     private List<OrderProduct> orderProducts;
 
     /**

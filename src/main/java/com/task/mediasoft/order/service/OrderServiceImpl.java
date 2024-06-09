@@ -1,6 +1,7 @@
 package com.task.mediasoft.order.service;
 
 
+import com.task.mediasoft.customer.model.Customer;
 import com.task.mediasoft.customer.service.CustomerService;
 import com.task.mediasoft.order.exception.OrderFailedCreateException;
 import com.task.mediasoft.order.exception.OrderForbiddenCustomerException;
@@ -16,8 +17,13 @@ import com.task.mediasoft.order.model.dto.ViewProductFromOrderDTO;
 import com.task.mediasoft.order.repository.OrderRepository;
 import com.task.mediasoft.orderProduct.model.OrderProduct;
 import com.task.mediasoft.orderProduct.repository.OrderProductRepository;
+import com.task.mediasoft.product.controller.model.CustomerInfo;
+import com.task.mediasoft.product.controller.model.OrderInfo;
 import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.service.ProductService;
+import com.task.mediasoft.restService.accountService.AccountService;
+import com.task.mediasoft.restService.crmService.CrmService;
+import com.task.mediasoft.session.CustomerIdProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -39,6 +46,9 @@ public class OrderServiceImpl implements OrderService {
     private final OrderProductRepository orderProductRepository;
     private final ProductService productService;
     private final CustomerService customerService;
+    private final AccountService accountService;
+    private final CrmService crmService;
+    private final CustomerIdProvider customerIdProvider;
 
     /**
      * Получает заказ по его идентификатору.
@@ -70,6 +80,50 @@ public class OrderServiceImpl implements OrderService {
                 .map(product -> product.getPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return new ViewOrderWithProductDTO(id, products, totalPrice);
+    }
+
+    /**
+     * Получает информацию о продуктах из базы данных.
+     *
+     * @return Карта, где ключом является UUID продукта, а значением - список информации о заказах, содержащих этот продукт.
+     */
+    @Transactional(readOnly = true)
+    public Map<UUID, List<OrderInfo>> getProductsInfo() {
+        List<String> logins = customerService.getAllCustomer().stream()
+                .map(Customer::getLogin)
+                .toList();
+
+        CompletableFuture<Map<String, String>> accountNumbersFuture = accountService.getAccounts(logins);
+        CompletableFuture<Map<String, String>> innsFuture = crmService.getInns(logins);
+
+        return orderRepository.findAll().stream()
+                .filter(order -> order.getStatus() == OrderStatus.CREATED || order.getStatus() == OrderStatus.CONFIRMED)
+                .flatMap(order -> order.getOrderProducts().stream())
+                .collect(Collectors.groupingBy(OrderProduct::getProduct))
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().getId(),
+                        entry -> entry.getValue().stream()
+                                .map(orderProduct -> {
+                                    Order order = orderProduct.getOrder();
+                                    Customer customer = order.getCustomer();
+                                    CustomerInfo customerInfo = new CustomerInfo(
+                                            customer.getId(),
+                                            accountNumbersFuture.join().get(customer.getLogin()),
+                                            customer.getEmail(),
+                                            innsFuture.join().get(customer.getLogin())
+                                    );
+                                    return new OrderInfo(
+                                            order.getId(),
+                                            customerInfo,
+                                            order.getStatus(),
+                                            order.getDeliveryAddress(),
+                                            orderProduct.getQuantity()
+                                    );
+                                })
+                                .toList()
+                ));
     }
 
     /**
