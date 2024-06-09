@@ -1,6 +1,6 @@
-package com.task.mediasoft.configuration.properties;
+package com.task.mediasoft.configuration.properties.currencyService;
 
-import com.task.mediasoft.configuration.properties.model.MethodsProperties;
+import com.task.mediasoft.configuration.properties.currencyService.model.CurrencyMethodsProperties;
 import com.task.mediasoft.configuration.properties.model.MockProperties;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "rest.currency-service")
 @Getter
 @Setter
-public class ConfigProperties {
+public class CurrencyServiceProperties {
 
     /**
      * Модель настроек мок-сервиса.
@@ -30,5 +30,5 @@ public class ConfigProperties {
     /**
      * Модель настроек методов для работы с валютами.
      */
-    private MethodsProperties methods;
+    private CurrencyMethodsProperties methods;
 }

@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * Сервис для работы с клиентами.
  */
@@ -30,6 +32,15 @@ public class CustomerService {
                 .orElseThrow(() -> new CustomerNotFoundExceptionById(id));
     }
 
+    /**
+     * Получает список всех клиентов из базы данных.
+     *
+     * @return Список всех клиентов.
+     */
+    @Transactional(readOnly = true)
+    public List<Customer> getAllCustomer() {
+        return customerRepository.findAll();
+    }
 
     /**
      * Создает нового клиента на основе переданных данных.

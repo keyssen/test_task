@@ -5,12 +5,16 @@ import com.task.mediasoft.order.model.dto.ChangeStatusDTO;
 import com.task.mediasoft.order.model.dto.SaveOrderDTO;
 import com.task.mediasoft.order.model.dto.SaveOrderProductDTO;
 import com.task.mediasoft.order.model.dto.ViewOrderWithProductDTO;
+import com.task.mediasoft.product.controller.model.OrderInfo;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface OrderService {
     ViewOrderWithProductDTO getViewOrderWithProductDTO(UUID id);
+
+    Map<UUID, List<OrderInfo>> getProductsInfo();
 
     Order createOrder(SaveOrderDTO createOrderDTO);
 

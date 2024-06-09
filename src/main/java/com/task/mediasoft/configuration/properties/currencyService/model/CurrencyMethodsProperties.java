@@ -1,4 +1,4 @@
-package com.task.mediasoft.configuration.properties.model;
+package com.task.mediasoft.configuration.properties.currencyService.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class MethodsProperties {
+public class CurrencyMethodsProperties {
 
     /**
      * URL эндпоинта для получения курсов валют.
