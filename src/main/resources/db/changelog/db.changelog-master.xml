@@ -1,5 +1,5 @@
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
 
@@ -13,6 +13,9 @@
 
     <include file="/db/changelog/changeset/create-order-product-table.xml"/>
 
+    <include file="/db/changelog/changeset/order-add-business-key.xml"/>
+
+    <include file="/db/changelog/changeset/order-add-delivery-date-time.xml"/>
     <!--    <include file="/db/changelog/changeset/insert-products.xml"/>-->
 
 </databaseChangeLog>

@@ -43,4 +43,13 @@ public class AccountServiceImpl implements AccountService {
                 })
                 .toFuture();
     }
+
+    @Override
+    public String getAccount(String login) {
+        return this.accountServiceWebClient.post()
+                .uri(String.format("%s/%s", accountServiceProperties.getMethods().getGetAccount(), login))
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+    }
 }

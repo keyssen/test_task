@@ -11,7 +11,7 @@ spring:
         format_sql: true
     show-sql: true
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
 
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -34,7 +34,7 @@ kafka:
 rest:
   currency-service:
     mock:
-      enabled: false
+      enabled: true
     #    host: ${CURRENCY_URL:http://localhost:8081} #хост сервиса валют
     host: ${CURRENCY_URL:http://currency-service.myspace.svc.cluster.local:8080} #хост сервиса валют
     methods:
@@ -55,3 +55,11 @@ rest:
     host: ${CRM_URL:http://crm-service.myspace.svc.cluster.local:8080} #хост CRM сервиса
     methods:
       get-inn: /crm #урл эндпоинта с ИНН для GET запроса
+
+  camunda-service:
+    mock:
+      enabled: false
+    #    host: ${CRM_URL:http://localhost:8084} #хост CRM сервиса
+    host: ${CAMUNDA_URL:http://localhost:8084} #хост CRM сервиса
+    methods:
+      start-confirm: confirm/start #урл эндпоинта с ИНН для GET запроса

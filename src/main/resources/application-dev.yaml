@@ -45,3 +45,11 @@ rest:
     host: ${CRM_URL:http://crm-service.myspace.svc.cluster.local:8080} #хост CRM сервиса
     methods:
       get-inn: /crm #урл эндпоинта с ИНН для GET запроса
+
+  camunda-service:
+    mock:
+      enabled: false
+    #    host: ${CRM_URL:http://localhost:8084} #хост CRM сервиса
+    host: ${CAMUNDA_URL:http://localhost:8084} #хост CRM сервиса
+    methods:
+      start-confirm: confirm/start #урл эндпоинта с ИНН для GET запроса

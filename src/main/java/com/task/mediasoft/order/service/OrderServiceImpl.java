@@ -12,6 +12,7 @@ import com.task.mediasoft.order.model.OrderStatus;
 import com.task.mediasoft.order.model.dto.ChangeStatusDTO;
 import com.task.mediasoft.order.model.dto.SaveOrderDTO;
 import com.task.mediasoft.order.model.dto.SaveOrderProductDTO;
+import com.task.mediasoft.order.model.dto.StartConfirmDTO;
 import com.task.mediasoft.order.model.dto.ViewOrderWithProductDTO;
 import com.task.mediasoft.order.model.dto.ViewProductFromOrderDTO;
 import com.task.mediasoft.order.repository.OrderRepository;
@@ -22,8 +23,8 @@ import com.task.mediasoft.product.controller.model.OrderInfo;
 import com.task.mediasoft.product.model.Product;
 import com.task.mediasoft.product.service.ProductService;
 import com.task.mediasoft.restService.accountService.AccountService;
+import com.task.mediasoft.restService.camunda.CamundaService;
 import com.task.mediasoft.restService.crmService.CrmService;
-import com.task.mediasoft.session.CustomerIdProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,7 +49,7 @@ public class OrderServiceImpl implements OrderService {
     private final CustomerService customerService;
     private final AccountService accountService;
     private final CrmService crmService;
-    private final CustomerIdProvider customerIdProvider;
+    private final CamundaService camundaService;
 
     /**
      * Получает заказ по его идентификатору.
@@ -58,7 +59,8 @@ public class OrderServiceImpl implements OrderService {
      * @throws OrderNotFoundExceptionById      Если заказ с указанным идентификатором не найден.
      * @throws OrderForbiddenCustomerException Если текущий клиент не имеет доступа к заказу.
      */
-    private Order getOrderById(UUID id) {
+    @Transactional(readOnly = true)
+    public Order getOrderById(UUID id) {
         return orderRepository.findById(id)
                 .orElseThrow(() -> new OrderNotFoundExceptionById(id));
     }
@@ -229,14 +231,33 @@ public class OrderServiceImpl implements OrderService {
     public Order changeOrderStatus(UUID id, ChangeStatusDTO changeStatusDTO) {
         final Order currentOrder = getOrderById(id);
         OrderStatus currentOrderStatus = currentOrder.getStatus();
-        if (currentOrderStatus == OrderStatus.CANCELLED || currentOrderStatus == OrderStatus.DONE || currentOrderStatus == OrderStatus.REJECTED || currentOrderStatus.compareTo(changeStatusDTO.getStatus()) > 0) {
-            throw new OrderStatusException();
-        }
-        if (changeStatusDTO.getStatus() == OrderStatus.CANCELLED && currentOrderStatus != OrderStatus.CREATED) {
-            throw new OrderStatusException(OrderStatus.CREATED);
+//        if (currentOrderStatus == OrderStatus.CANCELLED || currentOrderStatus == OrderStatus.DONE || currentOrderStatus == OrderStatus.REJECTED || currentOrderStatus.compareTo(changeStatusDTO.getStatus()) > 0) {
+//            throw new OrderStatusException();
+//        }
+//        if (changeStatusDTO.getStatus() == OrderStatus.CANCELLED && currentOrderStatus != OrderStatus.CREATED) {
+//            throw new OrderStatusException(OrderStatus.CREATED);
+//        }
+        if (changeStatusDTO.getStatus() == OrderStatus.CONFIRMED && changeStatusDTO.getDeliveryDateTime() != null) {
+            currentOrder.setDeliveryDateTime(changeStatusDTO.getDeliveryDateTime());
         }
         currentOrder.setStatus(changeStatusDTO.getStatus());
         return orderRepository.save(currentOrder);
+    }
+
+    @Transactional
+    public void confirmStart(UUID id) {
+        final Order currentOrder = getOrderById(id);
+        String login = currentOrder.getCustomer().getLogin();
+
+        final BigDecimal totalPrice = currentOrder.getOrderProducts().stream()
+                .map(product -> product.getFrozenPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        UUID currentBusinessKey = UUID.fromString(camundaService.startConfirm(new StartConfirmDTO(currentOrder.getId(), currentOrder.getDeliveryAddress(), crmService.getInn(login), accountService.getAccount(login), totalPrice, login)));
+        currentOrder.setBusinessKey(currentBusinessKey);
+        currentOrder.setStatus(OrderStatus.PROCESSING);
+
+        orderRepository.save(currentOrder);
     }
 
     /**

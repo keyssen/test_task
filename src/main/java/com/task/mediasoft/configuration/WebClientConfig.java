@@ -2,6 +2,7 @@ package com.task.mediasoft.configuration;
 
 
 import com.task.mediasoft.configuration.properties.accountService.AccountServiceProperties;
+import com.task.mediasoft.configuration.properties.camundaService.CamundaServiceProperties;
 import com.task.mediasoft.configuration.properties.crmService.CrmServiceProperties;
 import com.task.mediasoft.configuration.properties.currencyService.CurrencyServiceProperties;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class WebClientConfig {
     private final AccountServiceProperties accountServiceProperties;
     private final CrmServiceProperties crmServiceProperties;
     private final CurrencyServiceProperties currencyServiceProperties;
+    private final CamundaServiceProperties camundaServiceProperties;
 
     @Bean
     public WebClient accountServiceWebClient(WebClient.Builder webClientBuilder) {
@@ -38,5 +40,10 @@ public class WebClientConfig {
     @Bean
     public WebClient currencyServiceWebClient(WebClient.Builder webClientBuilder) {
         return webClientBuilder.baseUrl(currencyServiceProperties.getHost()).build();
+    }
+
+    @Bean
+    public WebClient camundaServiceWebClient(WebClient.Builder webClientBuilder) {
+        return webClientBuilder.baseUrl(camundaServiceProperties.getHost()).build();
     }
 }

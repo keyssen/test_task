@@ -12,4 +12,6 @@ public interface CrmService {
      * @return CompletableFuture с картой, где ключом является логин, а значением - соответствующая информация об ИНН.
      */
     CompletableFuture<Map<String, String>> getInns(List<String> logins);
+
+    String getInn(String login);
 }

@@ -56,4 +56,9 @@ public class CrmServiceClientMock implements CrmService {
             return loginCodes;
         });
     }
+
+    @Override
+    public String getInn(String login) {
+        return generateRandomCode();
+    }
 }

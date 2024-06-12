@@ -5,6 +5,7 @@ package com.task.mediasoft.order.model;
  */
 public enum OrderStatus {
     CREATED,    // Создан
+    PROCESSING, // В процессе
     CONFIRMED,  // Подтвержден
     CANCELLED,  // Отменен
     DONE,       // Выполнен
