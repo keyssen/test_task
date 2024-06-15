@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: myspace
+  name: account-deployment
+  labels:
+    app: account-pod
+spec:
+  #  strategy:
+  #    type: RollingUpdate #еще есть Recreate
+  selector:
+    matchLabels:
+      app: account-pod
+  template:
+    metadata:
+      labels:
+        app: account-pod
+    spec:
+      containers:
+        - name: account-pod #имя контейнера внутри пода, может быть несколько разных контейнеров внутри пода
+          image: keyssen/account-service:v1 #название имейджа из докерхаба. кубер сам выкачает имейдж
+          ports:
+            - containerPort: 8082 #номер порта, открытый для контейнера, например тут нужно указать порт, на котором запущен томкат SpringBoot приложения
+              name: app

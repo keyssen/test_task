@@ -8,6 +8,7 @@ import com.task.mediasoft.product.service.ExchangeRateProvider;
 import com.task.mediasoft.product.service.ProductService;
 import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
 import com.task.mediasoft.s3.S3Service;
+import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
 import com.task.mediasoft.session.CurrencyEnum;
 import com.task.mediasoft.session.CurrencyProvider;
 import jakarta.validation.Valid;

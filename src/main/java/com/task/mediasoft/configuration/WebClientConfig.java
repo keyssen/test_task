@@ -1,7 +1,9 @@
 package com.task.mediasoft.configuration;
 
 
-import com.task.mediasoft.configuration.properties.ConfigProperties;
+import com.task.mediasoft.configuration.properties.accountService.AccountServiceProperties;
+import com.task.mediasoft.configuration.properties.crmService.CrmServiceProperties;
+import com.task.mediasoft.configuration.properties.currencyService.CurrencyServiceProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,22 +20,23 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 @RequiredArgsConstructor
 public class WebClientConfig {
-    private final ConfigProperties configProperties;
+    private final AccountServiceProperties accountServiceProperties;
+    private final CrmServiceProperties crmServiceProperties;
+    private final CurrencyServiceProperties currencyServiceProperties;
 
-    /**
-     * Создает и возвращает настроенный экземпляр {@link WebClient}.
-     * <p>
-     * Метод использует предоставленный {@link WebClient.Builder} для настройки экземпляра WebClient
-     * с базовым URL, который извлекается из свойства конфигурации "currency-service.host". Этот URL
-     * используется как начальная точка для всех последующих запросов, отправляемых с помощью данного клиента.
-     * </p>
-     *
-     * @param webClientBuilder Предоставленный {@link WebClient.Builder} для создания настроенного клиента.
-     * @return Настроенный экземпляр {@link WebClient}, готовый к использованию для выполнения HTTP запросов.
-     * @throws NullPointerException если свойство "currency-service.host" не установлено в конфигурации.
-     */
     @Bean
-    public WebClient webClient(WebClient.Builder webClientBuilder) {
-        return webClientBuilder.baseUrl(configProperties.getHost()).build();
+    public WebClient accountServiceWebClient(WebClient.Builder webClientBuilder) {
+        System.out.println("Initializing WebClient with host: ");
+        return webClientBuilder.baseUrl(accountServiceProperties.getHost()).build();
+    }
+
+    @Bean
+    public WebClient crmServiceWebClient(WebClient.Builder webClientBuilder) {
+        return webClientBuilder.baseUrl(crmServiceProperties.getHost()).build();
+    }
+
+    @Bean
+    public WebClient currencyServiceWebClient(WebClient.Builder webClientBuilder) {
+        return webClientBuilder.baseUrl(currencyServiceProperties.getHost()).build();
     }
 }

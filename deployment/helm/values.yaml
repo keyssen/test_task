@@ -1,0 +1,19 @@
+name: productk8s
+spring:
+  profiles: prod
+secret:
+  name: productk8s-secret
+deployment:
+  db:
+    image: postgres:latest
+    port: 5432
+    replicas: 1
+service:
+  db:
+    name: mediasoft_test
+    host: "mediasoft_test"
+    type: ClusterIP
+    port: 5432
+    sport: "5432"
+    dbname: mediasoft_test
+    dbschema: public

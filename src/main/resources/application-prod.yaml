@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/mediasoft_test
-    username: postgres
-    password: ${PWD}
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432}/${DATABASE_NAME:mediasoft_test}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
     driverClassName: org.postgresql.Driver
 
   jpa:
@@ -27,13 +27,34 @@ app:
     priceIncreasePercentage: 10.1
     optimization: true
 
+kafka:
+  bootstrapAddress: localhost:9091
+  groupId: group1
+
 rest:
   currency-service:
     mock:
-      enabled: true
-    host: http://localhost:8081 #хост второго сервиса
+      enabled: false
+    #    host: ${CURRENCY_URL:http://localhost:8081} #хост сервиса валют
+    host: ${CURRENCY_URL:http://currency-service.myspace.svc.cluster.local:8080} #хост сервиса валют
     methods:
       get-currency: /currencies #урл эндпоинта с курсами для GET запроса
+
+  account-service:
+    mock:
+      enabled: true
+    #    host: ${ACCOUNT_URL:http://localhost:8082} #хост сервиса аккаунтов
+    host: ${ACCOUNT_URL:http://account-service.myspace.svc.cluster.local:8080} #хост сервиса аккаунтов
+    methods:
+      get-account: /account #урл эндпоинта с аккаунтами для GET запроса
+
+  crm-service:
+    mock:
+      enabled: true
+    #    host: ${CRM_URL:http://localhost:8083} #хост CRM сервиса
+    host: ${CRM_URL:http://crm-service.myspace.svc.cluster.local:8080} #хост CRM сервиса
+    methods:
+      get-inn: /crm #урл эндпоинта с ИНН для GET запроса
 
 s3:
   accessKeyId: test
