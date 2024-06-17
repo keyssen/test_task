@@ -20,7 +20,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Image {
+public class ImageEntity {
 
     @Id
     @UuidGenerator

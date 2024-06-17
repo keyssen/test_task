@@ -1,7 +1,6 @@
 package com.task.mediasoft.product.service;
 
-import com.task.mediasoft.configuration.properties.S3Properties;
-import com.task.mediasoft.image.Image;
+import com.task.mediasoft.image.ImageEntity;
 import com.task.mediasoft.image.service.ImageService;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionByArticle;
 import com.task.mediasoft.product.exception.ProductNotFoundExceptionById;
@@ -44,7 +43,6 @@ public class ProductService {
     private final ExchangeRateProvider exchangeRateProvider;
     private final ImageService imageService;
     private final S3Service s3ServiceImpl;
-    private final S3Properties s3Properties;
 
     /**
      * Получение продуктов с возможностью поиска по строке.
@@ -159,20 +157,18 @@ public class ProductService {
     }
 
     @Transactional
-    public boolean addImageToProduct(UUID productId, MultipartFile file) {
-        String fileName = file.getOriginalFilename();
-        Image iamge = imageService.createImage(getProductById(productId));
+    public String addImageToProduct(UUID productId, MultipartFile file) {
+        ImageEntity imageEntity = imageService.createImage(getProductById(productId));
         if (file.isEmpty()) {
             throw new RuntimeException("Please select a file to upload.");
         }
         try {
-            s3ServiceImpl.addFile(productId, iamge.getId(), file);
+            s3ServiceImpl.addFile(productId, imageEntity.getId(), file);
         } catch (IOException e) {
-            e.printStackTrace();
             throw new RuntimeException("Failed to upload file.");
         }
 
-        return true;
+        return String.format("%s/%s", imageEntity.getProduct().getId(), imageEntity.getId());
     }
 
     /**

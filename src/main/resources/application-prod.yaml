@@ -34,7 +34,7 @@ kafka:
 rest:
   currency-service:
     mock:
-      enabled: false
+      enabled: true
     #    host: ${CURRENCY_URL:http://localhost:8081} #хост сервиса валют
     host: ${CURRENCY_URL:http://currency-service.myspace.svc.cluster.local:8080} #хост сервиса валют
     methods:
@@ -60,5 +60,5 @@ s3:
   accessKeyId: test
   secretAccessKey: test
   serviceEndpoint: s3.localhost.localstack.cloud:4566
-  bucket: new-bucket-9109ce4b
+  bucket: new-bucket-13be60c2
   signingRegion: eu-central-1

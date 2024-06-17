@@ -8,16 +8,12 @@ import com.task.mediasoft.product.service.ExchangeRateProvider;
 import com.task.mediasoft.product.service.ProductService;
 import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
 import com.task.mediasoft.s3.S3Service;
-import com.task.mediasoft.product.service.searchCriteria.Criterial.SearchCriterial;
 import com.task.mediasoft.session.CurrencyEnum;
 import com.task.mediasoft.session.CurrencyProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -149,24 +146,24 @@ public class ProductController {
      */
 
     @PostMapping("/upload/{id}")
-    public boolean addFileToProduct(@PathVariable UUID id, @RequestParam("file") MultipartFile file) {
+    public String addFileToProduct(@PathVariable UUID id, @RequestParam("file") MultipartFile file) {
         return productService.addImageToProduct(id, file);
     }
 
     @GetMapping("/download/{id}")
-    public ResponseEntity<Resource> download(@PathVariable UUID id) {
-        Pair<byte[], String> pair = s3ServiceImpl.getZip(productService.getProductById(id));
-        byte[] zip = pair.getFirst();
-        String name = pair.getSecond();
+    public ResponseEntity<StreamingResponseBody> download(@PathVariable UUID id) {
+        final Product product = productService.getProductById(id);
+        StreamingResponseBody stream = out -> {
+            s3ServiceImpl.getZip(out, product);
+        };
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        headers.setContentDispositionFormData("attachment", String.format("%s.zip", name));
+        headers.setContentDispositionFormData("attachment", String.format("%s.zip", product.getArticle()));
 
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(new ByteArrayResource(zip));
+                .body(stream);
     }
 
 

@@ -5,23 +5,24 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.util.IOUtils;
 import com.task.mediasoft.configuration.properties.S3Properties;
-import com.task.mediasoft.image.Image;
+import com.task.mediasoft.image.ImageEntity;
 import com.task.mediasoft.image.service.ImageService;
 import com.task.mediasoft.product.model.Product;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.util.Pair;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class S3ServiceImpl implements S3Service {
@@ -29,19 +30,18 @@ public class S3ServiceImpl implements S3Service {
     private final S3Properties s3Properties;
     private final AmazonS3 s3Client;
 
-    public Pair<byte[], String> getZip(Product product) {
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-             ZipOutputStream zipOut = new ZipOutputStream(byteArrayOutputStream)) {
-            Map<String, Integer> fileNamesInZip = new HashMap<>();
-            for (Image image : imageService.getImagesByProductId(product.getId())) {
-                System.out.println(image.getId());
-                S3Object s3Object = s3Client.getObject(s3Properties.getBucket(), String.format("%s/%s", product.getId(), image.getId()));
-                ObjectMetadata objectMetadata = s3Object.getObjectMetadata();
-                String name = objectMetadata.getUserMetaDataOf("name");
-                String extension = objectMetadata.getUserMetaDataOf("extension");
-                String fullName = String.format("%s.%s", name, extension);
-                Integer count = fileNamesInZip.get(fullName);
-                ZipEntry entry;
+
+    public void getZip(OutputStream outputStream, Product product) {
+        try (ZipOutputStream zipOut = new ZipOutputStream(outputStream)) {
+            final Map<String, Integer> fileNamesInZip = new HashMap<>();
+            for (ImageEntity imageEntity : imageService.getImagesByProductId(product.getId())) {
+                final S3Object s3Object = s3Client.getObject(s3Properties.getBucket(), String.format("%s/%s", product.getId(), imageEntity.getId()));
+                final ObjectMetadata objectMetadata = s3Object.getObjectMetadata();
+                final String name = objectMetadata.getUserMetaDataOf("name");
+                final String extension = objectMetadata.getUserMetaDataOf("extension");
+                final String fullName = String.format("%s.%s", name, extension);
+                final Integer count = fileNamesInZip.get(fullName);
+                final ZipEntry entry;
                 if (count == null) {
                     fileNamesInZip.put(fullName, 1);
                     entry = new ZipEntry(fullName);
@@ -50,36 +50,36 @@ public class S3ServiceImpl implements S3Service {
                     entry = new ZipEntry(String.format("%s (%s).%s", name, count, extension));
                 }
                 zipOut.putNextEntry(entry);
-                byte[] buffer = IOUtils.toByteArray(s3Object.getObjectContent());
+                final byte[] buffer = IOUtils.toByteArray(s3Object.getObjectContent());
                 zipOut.write(buffer);
 
                 zipOut.closeEntry();
             }
-            return Pair.of(byteArrayOutputStream.toByteArray(), product.getArticle());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to upload file: ", e);
             throw new RuntimeException("Failed to upload file.");
         }
     }
 
-    public void addFile(UUID productId, UUID imageId, MultipartFile file) throws IOException {
+    public UUID addFile(UUID productId, UUID imageId, MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw new RuntimeException("Please select a file to upload.");
         }
 
-        byte[] fileContent = file.getBytes();
+        final byte[] fileContent = file.getBytes();
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(fileContent)) {
-            ObjectMetadata metadata = new ObjectMetadata();
+            final ObjectMetadata metadata = new ObjectMetadata();
 
             metadata.setContentLength(fileContent.length);
 
-            String fileName = file.getOriginalFilename();
-            int dotIndex = fileName.lastIndexOf('.');
+            final String fileName = file.getOriginalFilename();
+            final int dotIndex = fileName.lastIndexOf('.');
 
             metadata.addUserMetadata("name", fileName.substring(0, dotIndex));
             metadata.addUserMetadata("extension", fileName.substring(dotIndex + 1));
 
             s3Client.putObject(s3Properties.getBucket(), String.format("%s/%s", productId, imageId), inputStream, metadata);
+            return imageId;
         }
     }
 }

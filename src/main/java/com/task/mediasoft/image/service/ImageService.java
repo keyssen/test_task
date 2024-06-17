@@ -1,13 +1,13 @@
 package com.task.mediasoft.image.service;
 
-import com.task.mediasoft.image.Image;
+import com.task.mediasoft.image.ImageEntity;
 import com.task.mediasoft.product.model.Product;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ImageService {
-    List<Image> getImagesByProductId(UUID productId);
+    List<ImageEntity> getImagesByProductId(UUID productId);
 
-    Image createImage(Product product);
+    ImageEntity createImage(Product product);
 }
