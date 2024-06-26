@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.UUID;
 
 public interface OrderService {
+    Order getOrderById(UUID id);
+
     ViewOrderWithProductDTO getViewOrderWithProductDTO(UUID id, Long customerId);
 
     Map<UUID, List<OrderInfo>> getProductsInfo();

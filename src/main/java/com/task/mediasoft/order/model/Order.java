@@ -20,6 +20,7 @@ import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -65,6 +66,18 @@ public class Order {
     @NonNull
     @Column(name = "delivery_address", nullable = false)
     private String deliveryAddress;
+
+    /**
+     * Адрес доставки заказа.
+     */
+    @Column(name = "business_key")
+    private UUID businessKey;
+
+    /**
+     * Дата доставки.
+     */
+    @Column(name = "delivery_date_time")
+    private LocalDateTime deliveryDateTime;
 
     /**
      * Продукты, входящие в заказ.

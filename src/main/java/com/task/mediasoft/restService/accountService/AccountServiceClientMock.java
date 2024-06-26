@@ -56,4 +56,9 @@ public class AccountServiceClientMock implements AccountService {
             return loginCodes;
         });
     }
+
+    @Override
+    public String getAccount(String login) {
+        return generateRandomCode();
+    }
 }

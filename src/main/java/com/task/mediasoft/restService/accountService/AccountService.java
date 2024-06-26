@@ -12,4 +12,6 @@ public interface AccountService {
      * @return CompletableFuture с картой, где ключом является логин, а значением - соответствующая информация о аккаунте.
      */
     CompletableFuture<Map<String, String>> getAccounts(List<String> logins);
+
+    String getAccount(String login);
 }

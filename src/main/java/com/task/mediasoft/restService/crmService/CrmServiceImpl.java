@@ -43,4 +43,13 @@ public class CrmServiceImpl implements CrmService {
                 })
                 .toFuture();
     }
+
+    @Override
+    public String getInn(String login) {
+        return this.crmServiceWebClient.post()
+                .uri(String.format("%s/%s", crmServiceProperties.getMethods().getGetInn(), login))
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+    }
 }

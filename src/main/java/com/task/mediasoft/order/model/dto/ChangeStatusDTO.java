@@ -4,6 +4,8 @@ import com.task.mediasoft.order.model.OrderStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 /**
  * Data Transfer Object (DTO) для изменения статуса заказа.
  */
@@ -15,4 +17,6 @@ public class ChangeStatusDTO {
      */
     @NotNull(message = "Status is required")
     private OrderStatus status;
+    
+    private LocalDateTime deliveryDateTime;
 }
