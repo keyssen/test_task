@@ -11,7 +11,7 @@ spring:
         format_sql: true
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
 
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -63,3 +63,10 @@ rest:
     host: ${CAMUNDA_URL:http://localhost:8084} #хост CRM сервиса
     methods:
       start-confirm: confirm/start #урл эндпоинта с ИНН для GET запроса
+
+s3:
+  accessKeyId: test
+  secretAccessKey: test
+  serviceEndpoint: s3.localhost.localstack.cloud:4566
+  bucket: new-bucket-13be60c2
+  signingRegion: eu-central-1
