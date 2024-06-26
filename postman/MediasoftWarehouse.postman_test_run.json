@@ -1,0 +1,294 @@
+{
+	"id": "515fe316-246d-4460-ac07-ccd85c859dc6",
+	"name": "MediasoftWarehouse",
+	"timestamp": "2024-03-26T16:00:45.754Z",
+	"collection_id": "33784170-34c33f6e-c5bc-4448-8033-3b941e6185d7",
+	"folder_id": 0,
+	"environment_id": "33784170-be06c994-f1de-44d1-95e6-92564f7f1c3f",
+	"totalPass": 12,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2024-03-26T16:00:44.256Z",
+	"totalFail": 0,
+	"results": [
+		{
+			"id": "6d0e266e-cb15-4e5e-974d-89d15423c967",
+			"name": "Create product",
+			"url": "http://localhost:8080/products",
+			"time": 314,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Body creationDate is not null": true,
+				"Body lastQuantityChangeDate is null": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Body creationDate is not null": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Body lastQuantityChangeDate is null": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				314
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Body creationDate is not null": true,
+					"Body lastQuantityChangeDate is null": true
+				}
+			]
+		},
+		{
+			"id": "6c18ebdd-7e3c-40ae-823f-1881e8ae5975",
+			"name": "Create product negative",
+			"url": "http://localhost:8080/products",
+			"time": 29,
+			"responseCode": {
+				"code": 400,
+				"name": "Bad Request"
+			},
+			"tests": {
+				"Status code is 400": true
+			},
+			"testPassFailCounts": {
+				"Status code is 400": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				29
+			],
+			"allTests": [
+				{
+					"Status code is 400": true
+				}
+			]
+		},
+		{
+			"id": "b53d2f56-973b-4f63-9c7c-45df3942d074",
+			"name": "Pagination search products",
+			"url": "http://localhost:8080/products?page=1&size=5&search=product-name-1",
+			"time": 103,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				103
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "22e5d8e3-f4b5-4378-a553-4a0e22fbea98",
+			"name": "Pagination products",
+			"url": "http://localhost:8080/products?page=1&size=5",
+			"time": 16,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				16
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "5b473406-c64b-4f1d-8ac6-5bc8609a89ec",
+			"name": "Get product by id",
+			"url": "http://localhost:8080/products/633973fe-c662-42f8-afca-cdc36d092ac0",
+			"time": 14,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				14
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "7a5cecc2-802c-4da7-be69-2a506f571682",
+			"name": "Get product by article",
+			"url": "http://localhost:8080/products/getProductByArticle/product-article-1",
+			"time": 11,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				11
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "57d0111c-52ef-4c93-9aeb-d40e125bc33d",
+			"name": "Update product",
+			"url": "http://localhost:8080/products/633973fe-c662-42f8-afca-cdc36d092ac0",
+			"time": 26,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Body creationDate is not null": true,
+				"Body lastQuantityChangeDate is null": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Body creationDate is not null": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Body lastQuantityChangeDate is null": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				26
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Body creationDate is not null": true,
+					"Body lastQuantityChangeDate is null": true
+				}
+			]
+		},
+		{
+			"id": "b5b64236-f1b5-4f64-8e56-e96b6539f34d",
+			"name": "Delete product",
+			"url": "http://localhost:8080/products/633973fe-c662-42f8-afca-cdc36d092ac0",
+			"time": 12,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				12
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 525,
+	"collection": {
+		"requests": [
+			{
+				"id": "6d0e266e-cb15-4e5e-974d-89d15423c967",
+				"method": "POST"
+			},
+			{
+				"id": "6c18ebdd-7e3c-40ae-823f-1881e8ae5975",
+				"method": "POST"
+			},
+			{
+				"id": "b53d2f56-973b-4f63-9c7c-45df3942d074",
+				"method": "GET"
+			},
+			{
+				"id": "22e5d8e3-f4b5-4378-a553-4a0e22fbea98",
+				"method": "GET"
+			},
+			{
+				"id": "5b473406-c64b-4f1d-8ac6-5bc8609a89ec",
+				"method": "GET"
+			},
+			{
+				"id": "7a5cecc2-802c-4da7-be69-2a506f571682",
+				"method": "GET"
+			},
+			{
+				"id": "57d0111c-52ef-4c93-9aeb-d40e125bc33d",
+				"method": "PUT"
+			},
+			{
+				"id": "b5b64236-f1b5-4f64-8e56-e96b6539f34d",
+				"method": "DELETE"
+			}
+		]
+	}
+}

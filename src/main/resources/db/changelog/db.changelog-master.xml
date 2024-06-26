@@ -1,0 +1,24 @@
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <include file="/db/changelog/changeset/create-product-table.xml"/>
+
+    <include file="/db/changelog/changeset/alter-product-table.xml"/>
+
+    <include file="/db/changelog/changeset/create-customer-table.xml"/>
+
+    <include file="/db/changelog/changeset/create-order-table.xml"/>
+
+    <include file="/db/changelog/changeset/create-order-product-table.xml"/>
+
+    <include file="/db/changelog/changeset/order-add-business-key.xml"/>
+
+    <include file="/db/changelog/changeset/order-add-delivery-date-time.xml"/>
+
+    <include file="/db/changelog/changeset/create-image-table.xml"/>
+
+    <!--    <include file="/db/changelog/changeset/insert-products.xml"/>-->
+
+</databaseChangeLog>

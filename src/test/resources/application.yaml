@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:mediasoft_test
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+      show-sql: true
+      database-platform: org.hibernate.dialect.H2Dialect
+      properties:
+        hibernate.format_sql: true
+
+  h2:
+    console:
+      enabled: true
+
+  liquibase:
+    enabled: false
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+rest:
+  currency-service:
+    mock:
+      enabled: true
+    host: http://localhost:8081 #хост второго сервиса
+    methods:
+      get-currency: /currencies #урл эндпоинта с курсами для GET запроса

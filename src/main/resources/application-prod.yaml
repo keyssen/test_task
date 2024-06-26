@@ -1,0 +1,72 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432}/${DATABASE_NAME:mediasoft_test}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
+    driverClassName: org.postgresql.Driver
+
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
+
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.xml
+
+app:
+  scheduling:
+    enabled: false
+    period: 60000 #ms
+    priceIncreasePercentage: 10.1
+    optimization: true
+
+kafka:
+  bootstrapAddress: localhost:9091
+  groupId: group1
+
+rest:
+  currency-service:
+    mock:
+      enabled: true
+    #    host: ${CURRENCY_URL:http://localhost:8081} #хост сервиса валют
+    host: ${CURRENCY_URL:http://currency-service.myspace.svc.cluster.local:8080} #хост сервиса валют
+    methods:
+      get-currency: /currencies #урл эндпоинта с курсами для GET запроса
+
+  account-service:
+    mock:
+      enabled: true
+    #    host: ${ACCOUNT_URL:http://localhost:8082} #хост сервиса аккаунтов
+    host: ${ACCOUNT_URL:http://account-service.myspace.svc.cluster.local:8080} #хост сервиса аккаунтов
+    methods:
+      get-account: /account #урл эндпоинта с аккаунтами для GET запроса
+
+  crm-service:
+    mock:
+      enabled: true
+    #    host: ${CRM_URL:http://localhost:8083} #хост CRM сервиса
+    host: ${CRM_URL:http://crm-service.myspace.svc.cluster.local:8080} #хост CRM сервиса
+    methods:
+      get-inn: /crm #урл эндпоинта с ИНН для GET запроса
+
+  camunda-service:
+    mock:
+      enabled: false
+    #    host: ${CRM_URL:http://localhost:8084} #хост CRM сервиса
+    host: ${CAMUNDA_URL:http://localhost:8084} #хост CRM сервиса
+    methods:
+      start-confirm: confirm/start #урл эндпоинта с ИНН для GET запроса
+
+s3:
+  accessKeyId: test
+  secretAccessKey: test
+  serviceEndpoint: s3.localhost.localstack.cloud:4566
+  bucket: new-bucket-13be60c2
+  signingRegion: eu-central-1

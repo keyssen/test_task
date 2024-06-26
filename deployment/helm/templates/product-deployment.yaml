@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: myspace
+  name: product-deployment
+  labels:
+    app: product-app
+spec:
+  #  strategy:
+  #    type: RollingUpdate #еще есть Recreate
+  selector:
+    matchLabels:
+      app: product-app
+  template:
+    metadata:
+      labels:
+        app: product-app
+    spec:
+      containers:
+        - name: product-pod #имя контейнера внутри пода, может быть несколько разных контейнеров внутри пода
+          image: keyssen/product-service:v12 #название имейджа из докерхаба. кубер сам выкачает имейдж
+          ports:
+            - containerPort: 8080 #номер порта, открытый для контейнера, например тут нужно указать порт, на котором запущен томкат SpringBoot приложения
+              name: app
+          env: #переменные среды для запуска контейнера, переменная используется SpringBoot приложением
+            - name: DATABASE_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: product-configmap
+                  key: DATABASE_NAME
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: product-configmap
+                  key: DATABASE_URL
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: product-configmap
+                  key: SPRING_DATASOURCE_USERNAME
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: product-configmap
+                  key: SPRING_DATASOURCE_PASSWORD
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: product-configmap
+                  key: PROFILES

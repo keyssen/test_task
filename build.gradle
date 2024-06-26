@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.3'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.task'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    implementation 'org.springframework.kafka:spring-kafka'
+
+    implementation 'org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-rest:7.17.0'
+    implementation 'org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-webapp:7.17.0'
+    implementation 'org.camunda.bpm:camunda-engine-plugin-spin:7.17.0'
+    implementation 'org.camunda.spin:camunda-spin-core:1.18.0'
+    implementation 'org.camunda.spin:camunda-spin-dataformat-json-jackson:1.17.0'
+
+    // Добавляем зависимость для Swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+    // lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
+    runtimeOnly 'org.postgresql:postgresql'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'com.h2database:h2:2.1.210'
+
+    implementation 'org.liquibase:liquibase-core:4.27.0'
+
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.734'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
